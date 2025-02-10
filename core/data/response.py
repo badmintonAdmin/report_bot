@@ -4,7 +4,7 @@ import pandas as pd
 def all_tokens_to_usd(data: pd.DataFrame) -> list:
 
     if data.empty:
-        return ["NO DATA"]
+        return ["All tokens: NOT DATA"]
     all_token_usd = data.groupby('date')[['total_balance_usd', 'abs_diff_usd']].sum()
 
     token_usd = all_token_usd['total_balance_usd'].iloc[0]
@@ -24,7 +24,7 @@ def all_tokens_to_usd(data: pd.DataFrame) -> list:
 def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
 
     if data.empty:
-        return ["NO DATA"]
+        return ["LIQUID ASSETS: NOT DATA"]
     values_to_remove = ['LNDX', 'xBasket', 'xBASKET', 'xCORN', 'xRICE', 'xSOY', 'xWHEAT', 'wLNDX', 'ETHG']
     all_liquid_tokens = data[~data['tokens'].isin(values_to_remove)]
 
@@ -44,7 +44,7 @@ def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
 def lndx_amount(main: pd.DataFrame,lp_pool: pd.DataFrame) -> list:
 
     if main.empty:
-        return ["NO DATA"]
+        return ["LNDX: NOT DATA"]
     #traders
     all_lndx = main.copy()
     all_lndx = all_lndx.query('tokens=="LNDX"')
@@ -90,11 +90,11 @@ def lndx_amount(main: pd.DataFrame,lp_pool: pd.DataFrame) -> list:
 
 def amount_usd(main: pd.DataFrame) -> list:
     if main.empty:
-        return ["NO DATA"]
+        return ["USD: NOT DATA"]
     filtred_usdt = main.query('tokens=="USDT" | tokens=="USDC"')
 
     if filtred_usdt.empty:
-        return ["NO DATA"]
+        return ["USD: NOT DATA"]
 
     all_usdt = filtred_usdt.groupby("date")[['total_balance']].sum()
     diff_usdt = filtred_usdt.groupby("date")[['diff_amount']].sum()
@@ -112,11 +112,11 @@ def amount_usd(main: pd.DataFrame) -> list:
 
 def amount_eth(main: pd.DataFrame) -> list:
     if main.empty:
-        return ["NO DATA"]
+        return ["ETH: NOT DATA"]
     filtred_eth = main.query('tokens=="WETH" | tokens=="ETH"')
 
     if filtred_eth.empty:
-        return ["NO DATA"]
+        return ["ETH: NOT DATA"]
 
     all_eth = filtred_eth.groupby("date")[['total_balance']].sum()
     diff_eth = filtred_eth.groupby("date")[['diff_amount']].sum()
@@ -135,11 +135,11 @@ def amount_eth(main: pd.DataFrame) -> list:
 
 def amount_btc(main: pd.DataFrame) -> list:
     if main.empty:
-        return ["NO DATA"]
+        return ["BTC: NOT DATA"]
     filtred_wbtc = main.query('tokens=="WBTC" | tokens=="BTC"')
 
     if filtred_wbtc.empty:
-        return ["NO DATA"]
+        return ["BTC: NOT DATA"]
 
     all_wbtc = filtred_wbtc.groupby("date")[['total_balance']].sum()
     diff_wbtc = filtred_wbtc.groupby("date")[['diff_amount']].sum()
@@ -158,12 +158,12 @@ def amount_btc(main: pd.DataFrame) -> list:
 
 def xTokens_change(main: pd.DataFrame) -> list:
     if main.empty:
-        return ["NO DATA"]
+        return ["xTokens: NOT DATA"]
 
     main['tokens'] = main['tokens'].str.lower()
     filtred_xtokens = main.query('tokens in ["xwheat", "xsoy", "xcorn", "xrice", "xbasket"]')
     if filtred_xtokens.empty:
-        return ["NO DATA"]
+        return ["xTokens: NOT DATA"]
     all_xtokens = filtred_xtokens.groupby(["date", 'tokens'])[['diff_amount', 'diff_amount_usd']].sum()
     target_xtokens = all_xtokens.query('`diff_amount_usd` > 1000 | `diff_amount_usd` < -1000')
     arr_x_tokens =[]
@@ -184,7 +184,7 @@ def xTokens_change(main: pd.DataFrame) -> list:
 
 def lndx_holders(holders: pd.DataFrame) -> list:
     if holders.empty:
-        return ["NO DATA"]
+        return ["HOLDERS: NOT DATA"]
     q_lndx_holders = holders.query('types_tokens =="lndx"')
 
     sing = "+" if (q_lndx_holders['diff'].iloc[-1] > 0) else ""
@@ -209,5 +209,42 @@ def xToken_holders(holders: pd.DataFrame) -> list:
     x_count_str = "xTOKEN HOLDERS " + sing + str(count_change_holders_x) + ' | ' + str(count_holders_x)
 
     return [x_count_str]
+
+def all_contract_data(
+        xTokens: pd.DataFrame,
+        cTokens: pd.DataFrame,
+        cPrice: pd.DataFrame
+) -> list:
+    cTokens_price = cPrice.rename(columns={'asset': 'tokens'})
+    cTokens_price['merge_tokens'] = cTokens_price['tokens'].str[1:]
+    xTokens['merge_tokens'] = xTokens['tokens'].str[1:]
+    cTokens['merge_tokens'] = cTokens['tokens'].str[1:]
+
+    combined_data = pd.merge(xTokens, cTokens, on='merge_tokens')
+    final_data = pd.merge(combined_data, cTokens_price, on='merge_tokens')
+
+    final_data['no_sold'] = final_data['total_supply'] - final_data['balance']
+    final_data['all_token'] = final_data['no_sold'] + final_data['unclaimed']
+    final_data['CLAIMABLE'] = final_data['all_token'] * final_data['price'].apply(float)
+    claimable = final_data['CLAIMABLE'].sum()
+
+    return [claimable]
+
+def exchange_balance(
+        balance: pd.DataFrame,
+        claimable: list[float]
+) -> list:
+    if balance is None:
+        return ['ARBITRUM EXCHANGE: not data']
+
+    balance_wallets = balance.query('asset=="USDC"')
+
+    bw_amount = balance_wallets['balance'].iloc[-1]
+    bw_amount = "{:,.0f}".format(bw_amount)
+    claimable = "{:,.0f}".format(claimable[0])
+
+    bw_amount_str = "cTOKEN ARBITRUM EXCHANGE BALANCE $" + bw_amount + ' | ' + 'CLAIMABLE $' + claimable
+
+    return [bw_amount_str]
 
 
