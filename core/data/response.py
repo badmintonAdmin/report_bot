@@ -166,6 +166,8 @@ def xTokens_change(main: pd.DataFrame) -> list:
         return ["xTokens: NOT DATA"]
     all_xtokens = filtred_xtokens.groupby(["date", 'tokens'])[['diff_amount', 'diff_amount_usd']].sum()
     target_xtokens = all_xtokens.query('`diff_amount_usd` > 1000 | `diff_amount_usd` < -1000')
+    if target_xtokens.empty:
+        return ["No major sales of xTokens occurred."]
     arr_x_tokens =[]
     for index, row in target_xtokens.iterrows():
         str_sng = "$" if row['diff_amount'] < 0 else "$"
@@ -246,5 +248,22 @@ def exchange_balance(
     bw_amount_str = "cTOKEN ARBITRUM EXCHANGE BALANCE $" + bw_amount + ' | ' + 'CLAIMABLE $' + claimable
 
     return [bw_amount_str]
+
+def private_sold(balance: pd.DataFrame) -> list:
+    if balance is None:
+        return ['CASH OUT: NOT DATA']
+    sold = balance.query('sold_lndx<0')
+    if sold.empty:
+        return ['No cash-out occurred']
+    total_sold = sold['sold_lndx'].sum()
+    arr = []
+    for index, row in sold.iterrows():
+        sold_lndx = "{:,.2f}".format(row['sold_lndx'])
+        str_line = str(row['address']) + ' :sold LNDX: ' + str(sold_lndx)
+        arr.append(str_line)
+    str_total_sold = 'Total:' + str("{:,.2f}".format(total_sold))
+    arr.append(str_total_sold)
+
+    return [arr]
 
 
