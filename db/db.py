@@ -2,7 +2,9 @@ import pandas as pd
 import psycopg2
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
+
 
 class Database:
     def __init__(self):
@@ -11,9 +13,8 @@ class Database:
         self.password = os.getenv("PASSWORD")
         self.host = os.getenv("HOST")
         self.port = os.getenv("PORT")
-        self.sql_folder = os.path.join(os.path.dirname(__file__), 'sql')
+        self.sql_folder = os.path.join(os.path.dirname(__file__), "sql")
         self.conn = None
-
 
     def db_connection(self):
         if self.conn is None:
@@ -23,7 +24,7 @@ class Database:
                     user=self.db_user,
                     password=self.password,
                     host=self.host,
-                    port=self.port
+                    port=self.port,
                 )
             except psycopg2.Error as e:
                 print(f"Error database connect: {e}")
@@ -50,7 +51,7 @@ class Database:
             return None
 
         try:
-            with open(query_path, 'r') as file:
+            with open(query_path, "r") as file:
                 query = file.read()
             with conn.cursor() as cursor:
                 cursor.execute(query)
@@ -68,5 +69,6 @@ class Database:
         except psycopg2.Error as e:
             print(f"❌ Error query {query_file}: {e}")
             return None
+
 
 database = Database()
