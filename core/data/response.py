@@ -54,62 +54,54 @@ def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
     return [final_all_token_liq_usd]
 
 
-def lndx_amount(main: pd.DataFrame, lp_pool: pd.DataFrame) -> list:
+# Helper function to calculate totals and format
+def format_amount(amount, symbol=""):
+    return f"{symbol}{abs(amount):,.2f}"
 
+
+def lndx_amount(main: pd.DataFrame, lp_pool: pd.DataFrame) -> list:
     if main.empty:
         return ["LNDX: NOT DATA"]
-    # traders
-    all_lndx = main.copy()
-    all_lndx = all_lndx.query('tokens=="LNDX"')
-    all_lndx_trades = all_lndx.groupby("tokens")[
+
+    # Traders (LNDX tokens)
+    lndx_data = main.query('tokens=="LNDX"')
+    all_lndx_trades = lndx_data.groupby("tokens")[
         ["diff_amount", "diff_amount_usd", "abs_diff_usd"]
     ].sum()
-    all_lndx__diff = all_lndx_trades["diff_amount"]
-    # usd
-    all_lndx_usd = all_lndx.groupby("tokens")[
-        ["total_balance", "total_balance_usd"]
-    ].sum()
-    all_lndx_usd = all_lndx_usd["total_balance_usd"]
+    all_lndx_diff = all_lndx_trades["diff_amount"]
+    all_lndx_usd = lndx_data.groupby("tokens")[["total_balance_usd"]].sum()[
+        "total_balance_usd"
+    ]
 
     # CEX USDT
-    lndx_cex_usd = main.copy()
-    lndx_cex_usd = lndx_cex_usd.query('main=="CEX" & tokens=="USDT"')
-    total_cex = lndx_cex_usd["diff_amount"].sum()
+    cex_lndx = main.query('main=="CEX" & tokens=="USDT"')
+    total_cex = cex_lndx["diff_amount"].sum()
 
     # LP USD
-    lp_lndx = lp_pool
-    lp_lndx_USDC = lp_lndx.query('asset=="USDC"')["diff"]
+    lp_lndx_usdc = lp_pool.query('asset=="USDC"')["diff"].sum()
 
-    # Total usd
-    Total_usdc = total_cex + lp_lndx_USDC
+    # Total USD
+    total_usdc = total_cex + lp_lndx_usdc
 
-    # LP ETH wETH
-    lp_lndx = lp_pool
-    lp_lndx_ETH = lp_lndx.query('asset=="ETH" | asset=="WETH"')["diff"].sum()
+    # LP ETH (WETH or ETH)
+    lp_lndx_eth = lp_pool.query('asset in ["ETH", "WETH"]')["diff"].sum()
 
-    # rep
-    all_usdt_count = "{:,.2f}".format(float(abs(Total_usdc.iloc[0])))
-    diff_eth_count = "{:,.2f}".format(float(abs(lp_lndx_ETH)))
-    diff_lndx_count = "{:,.2f}".format(float(abs(all_lndx__diff.iloc[0])))
-    all_usd_lndx = "{:,.2f}".format(float(abs(all_lndx_usd.iloc[0])))
+    # Format output
+    diff_lndx_count = format_amount(all_lndx_diff.iloc[0])
+    all_usdt_count = format_amount(total_usdc, "$")
+    diff_eth_count = format_amount(lp_lndx_eth, "ETH ")
+    all_usd_lndx = format_amount(all_lndx_usd.iloc[0], "$")
 
+    # Add signs for positive/negative differences
     diff_lndx_count = (
-        "+" + diff_lndx_count
-        if float(all_lndx__diff.iloc[0]) > 0
-        else "-" + diff_lndx_count
+        f"+{diff_lndx_count}" if all_lndx_diff.iloc[0] > 0 else f"-{diff_lndx_count}"
     )
-    all_usdt_count = (
-        "+$" + all_usdt_count
-        if float(Total_usdc.iloc[0]) > 0
-        else "-$" + all_usdt_count
-    )
-    diff_eth_count = (
-        "+ETH " + diff_eth_count if float(lp_lndx_ETH) > 0 else "-ETH " + diff_eth_count
-    )
+    all_usdt_count = f"+{all_usdt_count}" if total_usdc > 0 else f"-{all_usdt_count}"
+    diff_eth_count = f"+{diff_eth_count}" if lp_lndx_eth > 0 else f"-{diff_eth_count}"
 
-    final_srt_report = f"LNDX {diff_lndx_count} | {all_usdt_count} | {diff_eth_count} (LNDX Balance = ${all_usd_lndx})"
+    final_report = f"LNDX {diff_lndx_count} | {all_usdt_count} | {diff_eth_count} (LNDX Balance = {all_usd_lndx})"
 
-    return [final_srt_report]
+    return [final_report]
 
 
 def amount_usd(main: pd.DataFrame) -> list:
@@ -193,29 +185,34 @@ def xTokens_change(main: pd.DataFrame) -> list:
     if main.empty:
         return ["xTokens: NOT DATA"]
 
+    main = main.copy()
     main["tokens"] = main["tokens"].str.lower()
-    filtred_xtokens = main.query(
-        'tokens in ["xwheat", "xsoy", "xcorn", "xrice", "xbasket"]'
-    )
-    if filtred_xtokens.empty:
+    target_tokens = {"xwheat", "xsoy", "xcorn", "xrice", "xbasket"}
+    filtered_xtokens = main[main["tokens"].isin(target_tokens)]
+
+    if filtered_xtokens.empty:
         return ["xTokens: NOT DATA"]
-    all_xtokens = filtred_xtokens.groupby(["date", "tokens"])[
+
+    all_xtokens = filtered_xtokens.groupby(["date", "tokens"])[
         ["diff_amount", "diff_amount_usd"]
     ].sum()
-    target_xtokens = all_xtokens.query(
-        "`diff_amount_usd` > 1000 | `diff_amount_usd` < -1000"
-    )
+
+    target_xtokens = all_xtokens[
+        (all_xtokens["diff_amount_usd"] > 1000)
+        | (all_xtokens["diff_amount_usd"] < -1000)
+    ]
+
     if target_xtokens.empty:
         return ["No major sales of xTokens occurred."]
+
     arr_x_tokens = []
-    for index, row in target_xtokens.iterrows():
-        str_sng = "$" if row["diff_amount"] < 0 else "$"
-        str_sng_1 = "-" if row["diff_amount"] < 0 else "+"
-        str_diff = "{:,.2f}".format(abs(row["diff_amount"]))
-        str_abs_diff_usd = "{:,.2f}".format(abs(row["diff_amount_usd"]))
-        str_sng += str_abs_diff_usd
-        recovery_str = index[1][0].lower() + index[1][1:].upper()
-        str_xtokens = f"{recovery_str} {str_sng_1}{str_diff} | {str_sng}"
+    for (date, token), row in target_xtokens.iterrows():
+        sign = "-" if row["diff_amount"] < 0 else "+"
+        str_diff = f"{abs(row['diff_amount']):,.2f}"
+        str_abs_diff_usd = f"{abs(row['diff_amount_usd']):,.2f}"
+        token_name = "".join([token[0], token[1].upper(), token[2:]])
+
+        str_xtokens = f"{token_name} {sign}{str_diff} | {sign}${str_abs_diff_usd}"
         arr_x_tokens.append(str_xtokens)
 
     return [arr_x_tokens]
@@ -224,13 +221,16 @@ def xTokens_change(main: pd.DataFrame) -> list:
 def lndx_holders(holders: pd.DataFrame) -> list:
     if holders.empty:
         return ["HOLDERS: NOT DATA"]
-    q_lndx_holders = holders.query('types_tokens =="lndx"')
 
-    sing = "+" if (q_lndx_holders["diff"].iloc[-1] > 0) else ""
-    count_change_holders_lndx = q_lndx_holders["diff"].iloc[-1]
-    count_holders_lndx = q_lndx_holders["count"].iloc[-1]
-    count_holders_lndx = "{:,.0f}".format(count_holders_lndx)
-    count_change_holders_lndx = "{:,.0f}".format(count_change_holders_lndx)
+    q_lndx_holders = holders.query('types_tokens == "lndx"')
+
+    if q_lndx_holders.empty:
+        return ["HOLDERS: NOT DATA"]
+
+    last_row = q_lndx_holders.iloc[-1]
+    sing = "+" if last_row["diff"] > 0 else ""
+    count_change_holders_lndx = "{:,.0f}".format(last_row["diff"])
+    count_holders_lndx = "{:,.0f}".format(last_row["count"])
 
     lndx_count_str = (
         f"LNDX HOLDERS {sing}{count_change_holders_lndx} | {count_holders_lndx}"
@@ -292,20 +292,23 @@ def exchange_balance(balance: pd.DataFrame, claimable: list[float]) -> list:
 
 
 def private_sold(balance: pd.DataFrame) -> list:
-    if balance is None:
+    if balance.empty:
         return ["CASH OUT: NOT DATA"]
-    sold = balance.query("sold_lndx<0")
+
+    sold = balance.query("sold_lndx < 0")
     if sold.empty:
         return ["No cash-out occurred"]
+
     total_sold = sold["sold_lndx"].sum()
     sold_wallet = sold["sold_lndx"].count()
 
     arr = [sold_wallet]
+
     sorted_sold = sold.sort_values(by="sold_lndx")
     for index, row in sorted_sold.iterrows():
-        sold_lndx = "{:,.2f}".format(row["sold_lndx"])
-        str_line = str(row["address"]) + " :sold LNDX: " + str(sold_lndx)
+        sold_lndx = f"{row['sold_lndx']:,.2f}"
+        str_line = f"{row['address']} :sold LNDX: {sold_lndx}"
         arr.append(str_line)
-    arr.append(str("{:,.2f}".format(total_sold)))
+    arr.append(f"{total_sold:,.2f}")
 
     return arr
