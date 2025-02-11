@@ -152,7 +152,7 @@ def amount_eth(main: pd.DataFrame) -> list:
     all_eth_number = "{:,.2f}".format(all_eth)
     diff_eth_number = "{:,.2f}".format(diff_eth)
     usdt_eth_number = "{:,.2f}".format(eth_usd)
-    diff_srt = "-" if (diff_eth < 0) else "+"
+    diff_srt = "" if (diff_eth < 0) else "+"
 
     final_str_eth = f"ETH {diff_srt}{diff_eth_number} (Balance {all_eth_number} ETH = ${usdt_eth_number})"
 
