@@ -23,7 +23,7 @@ async def save_report_to_log():
     print(report)
     print(f"Report saved as {filename}")
 
-    await tgbot.send_message("-4636588122", report)
+    await tgbot.send_message("137208701", report)  # -4636588122 137208701
 
 
 if __name__ == "__main__":
