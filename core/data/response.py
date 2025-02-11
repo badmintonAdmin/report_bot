@@ -138,47 +138,52 @@ def amount_usd(main: pd.DataFrame) -> list:
 def amount_eth(main: pd.DataFrame) -> list:
     if main.empty:
         return ["ETH: NOT DATA"]
-    filtred_eth = main.query('tokens=="WETH" | tokens=="ETH"')
 
-    if filtred_eth.empty:
+    filtered_eth = main[main["tokens"].isin(["WETH", "ETH"])]
+
+    if filtered_eth.empty:
         return ["ETH: NOT DATA"]
 
-    all_eth = filtred_eth.groupby("date")[["total_balance"]].sum()
-    diff_eth = filtred_eth.groupby("date")[["diff_amount"]].sum()
-    wbtc_eth = filtred_eth.groupby("date")[["total_balance_usd"]].sum()
-    all_eth = all_eth["total_balance"].iloc[0]
-    diff_eth = diff_eth["diff_amount"].iloc[0]
-    eth_usd = wbtc_eth["total_balance_usd"].iloc[0]
-    all_eth_number = "{:,.2f}".format(all_eth)
-    diff_eth_number = "{:,.2f}".format(diff_eth)
-    usdt_eth_number = "{:,.2f}".format(eth_usd)
-    diff_srt = "" if (diff_eth < 0) else "+"
+    grouped = (
+        filtered_eth.groupby("date")[
+            ["total_balance", "diff_amount", "total_balance_usd"]
+        ]
+        .sum()
+        .iloc[0]
+    )
 
-    final_str_eth = f"ETH {diff_srt}{diff_eth_number} (Balance {all_eth_number} ETH = ${usdt_eth_number})"
+    diff_sign = "" if grouped["diff_amount"] < 0 else "+"
 
-    return [final_str_eth]
+    final_eth_str = (
+        f"ETH {diff_sign}{grouped['diff_amount']:,.2f} "
+        f"(Balance {grouped['total_balance']:,.2f} ETH = ${grouped['total_balance_usd']:,.2f})"
+    )
+
+    return [final_eth_str]
 
 
 def amount_btc(main: pd.DataFrame) -> list:
     if main.empty:
         return ["BTC: NOT DATA"]
-    filtred_wbtc = main.query('tokens=="WBTC" | tokens=="BTC"')
 
-    if filtred_wbtc.empty:
+    filtered_wbtc = main[main["tokens"].isin(["WBTC", "BTC"])]
+
+    if filtered_wbtc.empty:
         return ["BTC: NOT DATA"]
 
-    all_wbtc = filtred_wbtc.groupby("date")[["total_balance"]].sum()
-    diff_wbtc = filtred_wbtc.groupby("date")[["diff_amount"]].sum()
-    wbtc_usd = filtred_wbtc.groupby("date")[["total_balance_usd"]].sum()
-    all_wbtc = all_wbtc["total_balance"].iloc[0]
-    diff_wbtc = diff_wbtc["diff_amount"].iloc[0]
-    wbtc_usd = wbtc_usd["total_balance_usd"].iloc[0]
-    all_wbtc_number = "{:,.2f}".format(all_wbtc)
-    diff_wbtc_number = "{:,.2f}".format(abs(diff_wbtc))
-    usdt_wbtc_number = "{:,.2f}".format(abs(wbtc_usd))
+    grouped = (
+        filtered_wbtc.groupby("date")[
+            ["total_balance", "diff_amount", "total_balance_usd"]
+        ]
+        .sum()
+        .iloc[0]
+    )
+
+    diff_sign = "-" if grouped["diff_amount"] < 0 else "+"
 
     final_str_btc = (
-        f"BTC {diff_wbtc_number} (Balance {all_wbtc_number} BTC = ${usdt_wbtc_number})"
+        f"BTC {diff_sign}{abs(grouped['diff_amount']):,.2f} "
+        f"(Balance {grouped['total_balance']:,.2f} BTC = ${grouped['total_balance_usd']:,.2f})"
     )
 
     return [final_str_btc]
