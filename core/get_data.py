@@ -5,6 +5,7 @@ from core.data.request_contract import *
 
 def get_all_data():
     big_arr = []
+    cash_out = []
     sql_queries = [
         "main.sql",
         "lndx_pools_balance.sql",
@@ -34,6 +35,6 @@ def get_all_data():
     big_arr.append(lndx_holders(db_data["holders_counts"]))
     big_arr.append(xToken_holders(db_data["holders_counts"]))
     big_arr.append(exchange_data)
-    big_arr.append(private_sold(db_data["private_balance"]))
+    cash_out.append(private_sold(db_data["private_balance"]))
 
-    return big_arr
+    return big_arr, cash_out

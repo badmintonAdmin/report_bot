@@ -1,5 +1,9 @@
 from core.get_data import *
+from core.template import generate_report
 
-data = get_all_data()
+def get_report():
 
-print(data)
+    data, cash_out = get_all_data()
+    text = generate_report(data, cash_out)
+    return text
+
