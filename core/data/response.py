@@ -115,22 +115,22 @@ def lndx_amount(main: pd.DataFrame, lp_pool: pd.DataFrame) -> list:
 def amount_usd(main: pd.DataFrame) -> list:
     if main.empty:
         return ["USD: NOT DATA"]
-    filtred_usdt = main.query('tokens=="USDT" | tokens=="USDC"')
 
-    if filtred_usdt.empty:
+    filtered_usdt = main[main["tokens"].isin(["USDT", "USDC"])]
+
+    if filtered_usdt.empty:
         return ["USD: NOT DATA"]
 
-    all_usdt = filtred_usdt.groupby("date")[["total_balance"]].sum()
-    diff_usdt = filtred_usdt.groupby("date")[["diff_amount"]].sum()
-    all_usdt = all_usdt["total_balance"].iloc[0]
-    diff_usdt = diff_usdt["diff_amount"].iloc[0]
-    all_usdt_number = "{:,.2f}".format(all_usdt)
-    diff_usdt_number = "{:,.2f}".format(abs(diff_usdt))
+    grouped = (
+        filtered_usdt.groupby("date")[["total_balance", "diff_amount"]].sum().iloc[0]
+    )
 
-    balance_usdt = "(Balance $" + all_usdt_number + ")"
-    diff_srt = "-$" if (diff_usdt < 0) else "+$"
-    diff_balance = "USD " + diff_srt + diff_usdt_number + " "
-    final_usdc_str = diff_balance + balance_usdt
+    diff_sign = "-$" if grouped["diff_amount"] < 0 else "+$"
+
+    final_usdc_str = (
+        f"USD {diff_sign}{abs(grouped['diff_amount']):,.2f} "
+        f"(Balance ${grouped['total_balance']:,.2f})"
+    )
 
     return [final_usdc_str]
 
