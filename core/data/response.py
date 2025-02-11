@@ -2,21 +2,21 @@ import pandas as pd
 
 
 def all_tokens_to_usd(data: pd.DataFrame) -> list:
-
     if data.empty:
         return ["All tokens: NOT DATA"]
-    all_token_usd = data.groupby("date")[["total_balance_usd", "abs_diff_usd"]].sum()
 
-    token_usd = all_token_usd["total_balance_usd"].iloc[0]
-    diff_token_usd = all_token_usd["abs_diff_usd"].iloc[0]
+    all_token_usd = (
+        data.groupby("date")[["total_balance_usd", "abs_diff_usd"]].sum().iloc[0]
+    )
 
-    token_usd_str = "{:,.2f}".format(token_usd)
-    diff_token_usd_str = "{:,.2f}".format(abs(diff_token_usd))
+    token_usd_str = f"{all_token_usd['total_balance_usd']:,.2f}"
+    diff_token_usd = all_token_usd["abs_diff_usd"]
+    diff_token_usd_str = f"{abs(diff_token_usd):,.2f}"
 
-    balance_usdt = "" + token_usd_str + ""
-    diff_srt = "-$" if (diff_token_usd < 0) else "+$"
-    diff_balance = "ALL TOKENS " + diff_srt + diff_token_usd_str + " | $"
-    final_all_token_usd = diff_balance + balance_usdt
+    diff_sign = "-$" if diff_token_usd < 0 else "+$"
+    final_all_token_usd = (
+        f"ALL TOKENS {diff_sign}{diff_token_usd_str} | ${token_usd_str}"
+    )
 
     return [final_all_token_usd]
 
