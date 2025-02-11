@@ -22,10 +22,10 @@ def all_tokens_to_usd(data: pd.DataFrame) -> list:
 
 
 def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
-
     if data.empty:
         return ["LIQUID ASSETS: NOT DATA"]
-    values_to_remove = [
+
+    values_to_remove = {
         "LNDX",
         "xBasket",
         "xBASKET",
@@ -35,21 +35,21 @@ def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
         "xWHEAT",
         "wLNDX",
         "ETHG",
-    ]
-    all_liquid_tokens = data[~data["tokens"].isin(values_to_remove)]
+    }
+    filtered_data = data[~data["tokens"].isin(values_to_remove)]
 
-    all_liquid_tokens = all_liquid_tokens.groupby("date")[
-        ["total_balance_usd", "abs_diff_usd"]
-    ].sum()
-    token_liq_usd = all_liquid_tokens["total_balance_usd"].iloc[0]
-    diff_liq_usd = all_liquid_tokens["abs_diff_usd"].iloc[0]
-    token__liq_usd_str = "{:,.2f}".format(token_liq_usd)
-    diff_token_liq_usd_str = "{:,.2f}".format(abs(diff_liq_usd))
+    all_liquid_tokens = (
+        filtered_data.groupby("date")[["total_balance_usd", "abs_diff_usd"]]
+        .sum()
+        .iloc[0]
+    )
 
-    balance_usdt = "" + token__liq_usd_str + ""
-    diff_srt = "-$" if (diff_liq_usd < 0) else "+$"
-    diff_balance = "LIQUID ASSETS " + diff_srt + diff_token_liq_usd_str + " | $"
-    final_all_token_liq_usd = diff_balance + balance_usdt
+    diff_sign = "-$" if all_liquid_tokens["abs_diff_usd"] < 0 else "+$"
+
+    final_all_token_liq_usd = (
+        f"LIQUID ASSETS {diff_sign}{abs(all_liquid_tokens['abs_diff_usd']):,.2f} | "
+        f"${all_liquid_tokens['total_balance_usd']:,.2f}"
+    )
 
     return [final_all_token_liq_usd]
 
