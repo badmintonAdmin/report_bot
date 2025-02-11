@@ -4,6 +4,10 @@ from datetime import datetime
 from core.run import get_report
 from tg import tgbot
 import asyncio
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def generate_random_string(length=5):
@@ -23,7 +27,7 @@ async def save_report_to_log():
     print(report)
     print(f"Report saved as {filename}")
 
-    await tgbot.send_message("137208701", report)  # -4636588122 137208701
+    await tgbot.send_message(os.getenv("MY_DEV"), report)
 
 
 if __name__ == "__main__":
