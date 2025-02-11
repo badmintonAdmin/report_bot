@@ -107,17 +107,7 @@ def lndx_amount(main: pd.DataFrame, lp_pool: pd.DataFrame) -> list:
         "+ETH " + diff_eth_count if float(lp_lndx_ETH) > 0 else "-ETH " + diff_eth_count
     )
 
-    final_srt_report = (
-        "LNDX "
-        + diff_lndx_count
-        + " | "
-        + all_usdt_count
-        + " | "
-        + diff_eth_count
-        + " (LNDX Balance = $"
-        + all_usd_lndx
-        + ")"
-    )
+    final_srt_report = f"LNDX {diff_lndx_count} | {all_usdt_count} | {diff_eth_count} (LNDX Balance = ${all_usd_lndx})"
 
     return [final_srt_report]
 
@@ -164,13 +154,7 @@ def amount_eth(main: pd.DataFrame) -> list:
     usdt_eth_number = "{:,.2f}".format(eth_usd)
 
     final_str_eth = (
-        "ETH "
-        + diff_eth_number
-        + " (Balance "
-        + all_eth_number
-        + " ETH = $"
-        + usdt_eth_number
-        + ")"
+        f"ETH {diff_eth_number} (Balance {all_eth_number} ETH = ${usdt_eth_number})"
     )
 
     return [final_str_eth]
@@ -195,13 +179,7 @@ def amount_btc(main: pd.DataFrame) -> list:
     usdt_wbtc_number = "{:,.2f}".format(abs(wbtc_usd))
 
     final_str_btc = (
-        "BTC "
-        + diff_wbtc_number
-        + " (Balance "
-        + all_wbtc_number
-        + " BTC = $"
-        + usdt_wbtc_number
-        + ")"
+        f"BTC {diff_wbtc_number} (Balance {all_wbtc_number} BTC = ${usdt_wbtc_number})"
     )
 
     return [final_str_btc]
@@ -249,12 +227,9 @@ def lndx_holders(holders: pd.DataFrame) -> list:
     count_holders_lndx = q_lndx_holders["count"].iloc[-1]
     count_holders_lndx = "{:,.0f}".format(count_holders_lndx)
     count_change_holders_lndx = "{:,.0f}".format(count_change_holders_lndx)
+
     lndx_count_str = (
-        "LNDX HOLDERS "
-        + sing
-        + str(count_change_holders_lndx)
-        + " | "
-        + str(count_holders_lndx)
+        f"LNDX HOLDERS {sing}{count_change_holders_lndx} | {count_holders_lndx}"
     )
 
     return [lndx_count_str]
@@ -270,13 +245,8 @@ def xToken_holders(holders: pd.DataFrame) -> list:
     count_holders_x = q_xToken_holders["count"].iloc[-1]
     count_holders_x = "{:,.0f}".format(count_holders_x)
     count_change_holders_x = "{:,.0f}".format(count_change_holders_x)
-    x_count_str = (
-        "xTOKEN HOLDERS "
-        + sing
-        + str(count_change_holders_x)
-        + " | "
-        + str(count_holders_x)
-    )
+
+    x_count_str = f"xTOKEN HOLDERS {sing}{count_change_holders_x} | {count_holders_x}"
 
     return [x_count_str]
 
@@ -311,11 +281,7 @@ def exchange_balance(balance: pd.DataFrame, claimable: list[float]) -> list:
     claimable = "{:,.0f}".format(claimable[0])
 
     bw_amount_str = (
-        "cTOKEN ARBITRUM EXCHANGE BALANCE $"
-        + bw_amount
-        + " | "
-        + "CLAIMABLE $"
-        + claimable
+        f"cTOKEN ARBITRUM EXCHANGE BALANCE ${bw_amount} | CLAIMABLE ${claimable}"
     )
 
     return [bw_amount_str]
@@ -336,8 +302,6 @@ def private_sold(balance: pd.DataFrame) -> list:
         sold_lndx = "{:,.2f}".format(row["sold_lndx"])
         str_line = str(row["address"]) + " :sold LNDX: " + str(sold_lndx)
         arr.append(str_line)
-    str_total_sold = "Total:" + str("{:,.2f}".format(total_sold))
-    arr.append(str_total_sold)
     arr.append(str("{:,.2f}".format(total_sold)))
 
     return arr
