@@ -53,32 +53,36 @@ async def get_tokens(message: types.Message):
     params = {"tokens": tuple(tokens)}
 
     where_clause = where_tokens(params)
+
     if where_clause is None or where_clause.empty:
         text = f'The selected tokens "{", ".join(choice_tokens)}" were not found or the database has not been updated yet.'
-        await message.answer(text)
-        await processing_message.delete()
-        return
+    else:
+        where_clause = where_clause.sort_values(
+            by=["token", "amount"], ascending=[True, False]
+        ).reset_index(drop=True)
 
-    where_clause = where_clause.sort_values(
-        by=["token", "amount"], ascending=[True, False]
-    ).reset_index(drop=True)
-    if len(choice_tokens) > 1:
-        data = apply_amount_filter(where_clause, choice_tokens[1])
-        if data.empty:
-            await processing_message.delete()
-            text = f'The selected tokens "{", ".join(choice_tokens)}" were not found.'
-            await send_long_message(message, text)
-            return
-        else:
-            text = format_where_tokens(data)
-            await send_long_message(message, text)
-            return
+        if len(choice_tokens) > 1:
+            where_clause = apply_amount_filter(where_clause, choice_tokens[1])
 
-    text = format_where_tokens(where_clause)
+        text = (
+            format_where_tokens(where_clause)
+            if not where_clause.empty
+            else f'The selected tokens "{", ".join(choice_tokens)}" were not found.'
+        )
+
     await send_long_message(message, text)
     await processing_message.delete()
 
 
 async def send_long_message(message: types.Message, text: str, chunk_size=4000):
-    for i in range(0, len(text), chunk_size):
-        await message.answer(text[i : i + chunk_size], parse_mode="Markdown")
+    paragraphs = text.split("\n")
+    buffer = ""
+    for paragraph in paragraphs:
+        if len(buffer) + len(paragraph) + 1 < chunk_size:
+            buffer += paragraph + "\n"
+        else:
+            await message.answer(buffer.strip(), parse_mode="Markdown")
+            buffer = paragraph + "\n"
+
+    if buffer.strip():
+        await message.answer(buffer.strip(), parse_mode="Markdown")

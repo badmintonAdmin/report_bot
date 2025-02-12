@@ -26,6 +26,7 @@ all_balance as (
     LEFT JOIN wallet_balances b
     ON b.wallet_id = w.id
     WHERE DATE_TRUNC('day',b.date) = CURRENT_DATE
+    AND b.price >0
 )
 SELECT * 
 FROM all_balance

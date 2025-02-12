@@ -7,11 +7,10 @@ def apply_amount_filter(data, filter_value):
             filtered = data[data["amount"] > amount]
             return filtered
         elif operator == "<":
-            filtered = data[data["amount"] > amount]
+            filtered = data[data["amount"] < amount]
             return filtered
 
     except (ValueError, IndexError):
         pass
 
-    print(f"Filtered {data["amount"]}")
     return data
