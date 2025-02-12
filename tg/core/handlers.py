@@ -1,11 +1,12 @@
 from aiogram import types
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
-from aiogram.utils.markdown import code
 from tg.utils.find_report import get_latest_file_by_date
 from tg.config import general_config as config
 from tg.core.commands_list import commands as c
 from tg.query.get_data import where_tokens
+from tg.utils.format_message import format_where_tokens
+from tg.utils.filter_data import apply_amount_filter
 
 router = Router()
 
@@ -55,20 +56,25 @@ async def get_tokens(message: types.Message):
     if where_clause is None or where_clause.empty:
         text = f'The selected tokens "{", ".join(choice_tokens)}" were not found or the database has not been updated yet.'
         await message.answer(text)
+        await processing_message.delete()
         return
 
     where_clause = where_clause.sort_values(
         by=["token", "amount"], ascending=[True, False]
     ).reset_index(drop=True)
+    if len(choice_tokens) > 1:
+        data = apply_amount_filter(where_clause, choice_tokens[1])
+        if data.empty:
+            await processing_message.delete()
+            text = f'The selected tokens "{", ".join(choice_tokens)}" were not found.'
+            await send_long_message(message, text)
+            return
+        else:
+            text = format_where_tokens(data)
+            await send_long_message(message, text)
+            return
 
-    content = ["*===Tokens that were found===*"]
-    for index, row in where_clause.iterrows():
-        content.append(
-            f'{index} -Token: {row["token"]} | Address: *{row["address"]}* | Chain: {row["chain"]} | Amount: *{row["amount"]:,.2f}*'
-        )
-        content.append("=" * 32)
-
-    text = "\n".join(content)
+    text = format_where_tokens(where_clause)
     await send_long_message(message, text)
     await processing_message.delete()
 

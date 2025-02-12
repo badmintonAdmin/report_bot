@@ -1,6 +1,5 @@
 import os
 from db.db import database
-import pandas as pd
 
 
 def where_tokens(tokens: dict[str, tuple[str, ...]]):
