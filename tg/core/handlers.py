@@ -33,3 +33,10 @@ async def report_command(message: types.Message):
         with open(f"{config.report_folder}/{report_path}", "r") as file:
             report_content = file.read()
     await message.answer(report_content)
+
+
+@router.message(Command("get_tokens"))
+async def get_tokens(message: types.Message):
+    tokens = message.text.split()[1:]
+    content = f"Вы выбрали токены: {', '.join(tokens)}"
+    await message.answer(content)
