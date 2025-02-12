@@ -41,7 +41,7 @@ async def report_command(message: types.Message):
 async def get_tokens(message: types.Message):
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
-        text = f"⚠️ You did not specify any tokens. Use:\n\n{code('/where_tokens xBasket,USDC,USDT')}"
+        text = "⚠️ You did not specify any tokens. Use:\n\n```\n/where_tokens xBasket,USDC,USDT\n```"
         await message.answer(text, parse_mode="Markdown")
         return
     processing_message = await message.answer(
@@ -60,10 +60,11 @@ async def get_tokens(message: types.Message):
     where_clause = where_clause.sort_values(
         by=["token", "amount"], ascending=[True, False]
     ).reset_index(drop=True)
-    content = ["===Tokens that were found==="]
+
+    content = ["*===Tokens that were found===*"]
     for index, row in where_clause.iterrows():
         content.append(
-            f'{index} -Token: {row["token"]} | Address: {row["address"]} | Chain: {row["chain"]} | Amount: {row["amount"]:,.2f}'
+            f'{index} -Token: {row["token"]} | Address: *{row["address"]}* | Chain: {row["chain"]} | Amount: *{row["amount"]:,.2f}*'
         )
         content.append("=" * 32)
 
@@ -74,4 +75,4 @@ async def get_tokens(message: types.Message):
 
 async def send_long_message(message: types.Message, text: str, chunk_size=4000):
     for i in range(0, len(text), chunk_size):
-        await message.answer(text[i : i + chunk_size])
+        await message.answer(text[i : i + chunk_size], parse_mode="Markdown")
