@@ -27,7 +27,7 @@ async def save_report_to_log():
     print(report)
     print(f"Report saved as {filename}")
 
-    await tgbot.send_message(os.getenv("MY_DEV"), report)
+    await tgbot.send_message(os.getenv("ADMIN_GROUP"), report)
 
 
 if __name__ == "__main__":

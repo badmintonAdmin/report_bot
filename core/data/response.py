@@ -208,11 +208,12 @@ def xTokens_change(main: pd.DataFrame) -> list:
     arr_x_tokens = []
     for (date, token), row in target_xtokens.iterrows():
         sign = "-" if row["diff_amount"] < 0 else "+"
+        sign_pool = "+" if row["diff_amount"] < 0 else "-"
         str_diff = f"{abs(row['diff_amount']):,.2f}"
         str_abs_diff_usd = f"{abs(row['diff_amount_usd']):,.2f}"
         token_name = "".join([token[0], token[1].upper(), token[2:]])
 
-        str_xtokens = f"{token_name} {sign}{str_diff} | {sign}${str_abs_diff_usd}"
+        str_xtokens = f"{token_name} {sign}{str_diff} | {sign_pool}${str_abs_diff_usd}"
         arr_x_tokens.append(str_xtokens)
 
     return [arr_x_tokens]
