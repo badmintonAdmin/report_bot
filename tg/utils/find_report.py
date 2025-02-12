@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from ..config import general_config
+from tg.config import general_config
 
 
 def get_latest_file_by_date():
