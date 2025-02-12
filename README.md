@@ -4,7 +4,7 @@
 
 ### Installation
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
 ```bash
 https://github.com/badmintonAdmin/report_bot.git
 cd report_bot
