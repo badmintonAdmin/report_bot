@@ -1,7 +1,7 @@
 from aiogram import Dispatcher, F
-from base_bot import basebot
+from tg.core.base_bot import basebot
 from aiogram.filters import CommandStart, Command
-from handlers import start_command, help_command, report_command
+from tg.core.handlers import start_command, help_command, report_command
 
 
 class LndxBot:

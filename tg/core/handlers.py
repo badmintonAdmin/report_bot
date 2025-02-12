@@ -1,7 +1,7 @@
 from aiogram import types
 from tg.utils.find_report import get_latest_file_by_date
 from tg.config import general_config as config
-from commands_list import commands as c
+from tg.core.commands_list import commands as c
 
 
 async def start_command(message: types.Message):

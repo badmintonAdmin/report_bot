@@ -1,5 +1,5 @@
 import asyncio
-from lndx_bot import LndxBot  #
+from lndx_bot import LndxBot
 
 
 async def main():
