@@ -70,5 +70,37 @@ class Database:
             print(f"❌ Error query {query_file}: {e}")
             return None
 
+    def execute_query_get(self, query_file, params):
+        query_path = os.path.join(self.sql_folder, query_file)
+
+        if not os.path.isfile(query_path):
+            print(f"❌ SQL file '{query_path}' do not find")
+            return None
+
+        conn = self.db_connection()
+        if not conn:
+            print(f"❌ error connected to database {query_file}")
+            return None
+
+        try:
+            with open(query_path, "r") as file:
+                query = file.read()
+            with conn.cursor() as cursor:
+                cursor.execute(query, params)
+                column_names = [desc[0] for desc in cursor.description]
+                rows = cursor.fetchall()
+
+            df = pd.DataFrame(rows, columns=column_names)
+
+            if df.empty:
+                print(f"Not data: {query_file}")
+                return None
+
+            return df
+
+        except psycopg2.Error as e:
+            print(f"❌ Error query {query_file}: {e}")
+            return None
+
 
 database = Database()
