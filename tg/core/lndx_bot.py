@@ -1,6 +1,5 @@
 from aiogram import Dispatcher, F
 from tg.core.base_bot import basebot
-from aiogram.filters import CommandStart, Command
 from tg.core.handlers import router
 
 
