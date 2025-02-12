@@ -86,3 +86,9 @@ async def send_long_message(message: types.Message, text: str, chunk_size=4000):
 
     if buffer.strip():
         await message.answer(buffer.strip(), parse_mode="Markdown")
+
+
+@router.message(Command("top_up"))
+async def top_up(message: types.Message):
+    help_text = "Нужно пополнить:\n\n"
+    await message.answer(help_text, parse_mode=None)
