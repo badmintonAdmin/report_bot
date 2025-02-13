@@ -5,7 +5,6 @@ from general_config import config
 
 class Gsheet:
     def __init__(self):
-        print(config)
         self.json_path = config.GOOGLE_CREDENTIALS_PATH
         self.table_id = config.SPREADSHEET_ID
         self.gc = gspread.service_account(self.json_path)
