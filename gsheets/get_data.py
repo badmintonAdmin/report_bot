@@ -39,7 +39,7 @@ def get_pools():
     now = pd.Timestamp.now()
     for i, row in filtered_df.iterrows():
         gen_content.append(
-            f"{row['NO']}:{row['name']} | DAYS: {(row['date'] - now).days}"
+            f"{row['NO']}: {row['name']} | DAYS: {(row['date'] - now).days}"
         )
         gen_content.append("=" * 32)
 
@@ -85,7 +85,3 @@ def get_epoch():
         )
         gen_content.append("=" * 32)
     return gen_content
-
-
-content = get_policies()
-print(content)
