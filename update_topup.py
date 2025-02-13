@@ -8,7 +8,7 @@ async def get_topup():
     bot = LndxBot()
     report = all_format()
     try:
-        await bot.send_message(chat_id=config.OWNER_ID, text=report)
+        await bot.send_message(chat_id=config.ALLOWED_GROUP_ID, text=report)
     finally:
         await bot.bot.session.close()
 
