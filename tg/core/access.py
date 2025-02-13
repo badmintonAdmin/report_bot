@@ -1,12 +1,10 @@
 import os
 from aiogram.types import Message
 from aiogram.filters import BaseFilter
-from dotenv import load_dotenv
+from general_config import config
 
-load_dotenv()
-
-OWNER_ID = int(os.getenv("OWNER_ID"))
-ALLOWED_GROUP_ID = int(os.getenv("ALLOWED_GROUP_ID"))
+OWNER_ID = int(config.OWNER_ID)
+ALLOWED_GROUP_ID = int(config.ALLOWED_GROUP_ID)
 
 
 class IsAllowed(BaseFilter):

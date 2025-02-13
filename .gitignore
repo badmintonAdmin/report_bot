@@ -54,3 +54,4 @@ docker-compose.override.yml
 Thumbs.db
 
 report_logs/*.txt
+google.json
