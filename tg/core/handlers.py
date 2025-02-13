@@ -8,6 +8,7 @@ from tg.query.get_data import where_tokens
 from tg.utils.format_message import format_where_tokens
 from tg.utils.filter_data import apply_amount_filter
 from tg.core.access import IsAllowed
+from gsheets.template import all_format
 
 router = Router()
 
@@ -91,5 +92,9 @@ async def send_long_message(message: types.Message, text: str, chunk_size=4000):
 
 @router.message(Command("get_topup"), IsAllowed())
 async def top_up(message: types.Message):
-    help_text = "Нужно пополнить:\n\n"
-    await message.answer(help_text, parse_mode=None)
+    processing_message = await message.answer(
+        "⏳ Processing your request, please wait..."
+    )
+    text = all_format()
+    await message.answer(text, parse_mode="Markdown")
+    await processing_message.delete()
