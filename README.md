@@ -47,3 +47,6 @@ You need to add a script to the DAG python update_report.py that will run after 
 ```bash
 python update_report.py
 ```
+```bash
+python update_topup.py
+```
