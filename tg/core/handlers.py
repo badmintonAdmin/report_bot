@@ -7,6 +7,7 @@ from tg.core.commands_list import commands as c
 from tg.query.get_data import where_tokens
 from tg.utils.format_message import format_where_tokens
 from tg.utils.filter_data import apply_amount_filter
+from tg.core.access import IsAllowed
 
 router = Router()
 
@@ -19,7 +20,7 @@ async def start_command(message: types.Message):
     )
 
 
-@router.message(Command("help"))
+@router.message(Command("help"), IsAllowed())
 async def help_command(message: types.Message):
     help_text = "Here are the available commands:\n\n"
     for command, description in c.items():
@@ -27,7 +28,7 @@ async def help_command(message: types.Message):
     await message.answer(help_text, parse_mode=None)
 
 
-@router.message(Command("get_report"))
+@router.message(Command("get_report"), IsAllowed())
 async def report_command(message: types.Message):
     report_path = get_latest_file_by_date()
     if report_path is None:
@@ -38,7 +39,7 @@ async def report_command(message: types.Message):
     await message.answer(report_content)
 
 
-@router.message(Command("where_tokens"))
+@router.message(Command("where_tokens"), IsAllowed())
 async def get_tokens(message: types.Message):
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
@@ -88,7 +89,7 @@ async def send_long_message(message: types.Message, text: str, chunk_size=4000):
         await message.answer(buffer.strip(), parse_mode="Markdown")
 
 
-@router.message(Command("top_up"))
+@router.message(Command("top_up"), IsAllowed())
 async def top_up(message: types.Message):
     help_text = "Нужно пополнить:\n\n"
     await message.answer(help_text, parse_mode=None)
