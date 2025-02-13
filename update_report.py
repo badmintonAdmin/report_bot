@@ -4,10 +4,7 @@ from datetime import datetime
 from core.run import get_report
 from tg.core.lndx_bot import LndxBot
 import asyncio
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from general_config import config
 
 
 def generate_random_string(length=5):
@@ -29,7 +26,7 @@ async def save_report_to_log():
     print(f"Report saved as {filename}")
 
     try:
-        await bot.send_message(chat_id=os.getenv("OWNER_ID"), text=report)
+        await bot.send_message(chat_id=config.OWNER_ID, text=report)
     finally:
         await bot.bot.session.close()
 
