@@ -36,6 +36,9 @@ TOKEN="your-telegram-bot-token"
 ALLOWED_GROUP_ID="your-admin-group-id"
 OWNER_ID="your-developer-id"
 ```
+### Add credentials
+add json to folder gsheets/google.json
+This is a special file with access to a Google spreadsheet.
 
 ### Start bot
 ```bash
