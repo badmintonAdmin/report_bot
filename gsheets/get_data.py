@@ -6,8 +6,44 @@ from datetime import timedelta
 
 def get_policies():
     df = gsheet.get_data(int(config.POLICIES))
+    if df.empty:
+        return ["The file with pools data is empty"]
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
+    df["done"] = df["done"].str.strip().str.upper() == "TRUE"
+    start_date = pd.Timestamp.now() + timedelta(days=5)
+    filtered_df = df[(df["date"] <= start_date) & (df["done"] == False)]
+    if filtered_df.empty:
+        return ["No pools to top up"]
+    gen_content = ["*==Top Up Policies==*"]
+    now = pd.Timestamp.now()
+    for i, row in filtered_df.iterrows():
+        gen_content.append(
+            f"{row['NO']}: (ID {row['id']}) | {row['name']} | DAYS: {(row['date'] - now).days}"
+        )
+        gen_content.append("=" * 32)
 
-    print(df)
+    return gen_content
+
+
+def get_pools():
+    df = gsheet.get_data(int(config.POOLS))
+    if df.empty:
+        return ["The file with pools data is empty"]
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
+    df["done"] = df["done"].str.strip().str.upper() == "TRUE"
+    start_date = pd.Timestamp.now() + timedelta(days=5)
+    filtered_df = df[(df["date"] <= start_date) & (df["done"] == False)]
+    if filtered_df.empty:
+        return ["No pools to top up"]
+    gen_content = ["*==Top Up Pools==*"]
+    now = pd.Timestamp.now()
+    for i, row in filtered_df.iterrows():
+        gen_content.append(
+            f"{row['NO']}:{row['name']} | DAYS: {(row['date'] - now).days}"
+        )
+        gen_content.append("=" * 32)
+
+    return gen_content
 
 
 def get_loans():
@@ -51,5 +87,5 @@ def get_epoch():
     return gen_content
 
 
-content = get_loans()
+content = get_policies()
 print(content)
