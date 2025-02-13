@@ -1,18 +1,16 @@
 import pandas as pd
 import psycopg2
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from general_config import config
 
 
 class Database:
     def __init__(self):
-        self.db_name = os.getenv("DB_NAME")
-        self.db_user = os.getenv("DB_USER")
-        self.password = os.getenv("PASSWORD")
-        self.host = os.getenv("HOST")
-        self.port = os.getenv("PORT")
+        self.db_name = config.DB_NAME
+        self.db_user = config.DB_USER
+        self.password = config.PASSWORD
+        self.host = config.HOST
+        self.port = config.PORT
         self.sql_folder = os.path.join(os.path.dirname(__file__), "sql")
         self.conn = None
 
