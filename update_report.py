@@ -29,7 +29,7 @@ async def save_report_to_log():
     print(f"Report saved as {filename}")
 
     try:
-        await bot.send_message(chat_id=os.getenv("MY_DEV"), text=report)
+        await bot.send_message(chat_id=os.getenv("OWNER_ID"), text=report)
     finally:
         await bot.bot.session.close()
 

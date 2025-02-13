@@ -1,4 +1,4 @@
-# LandX Report Bot
+# Report Bot
 
 ## 🚀 Installation and Setup
 
@@ -33,8 +33,8 @@ PORT="your-database-port"
 
 # Telegram params
 TOKEN="your-telegram-bot-token"
-ADMIN_GROUP="your-admin-group-id"
-MY_DEV="your-developer-id"
+ALLOWED_GROUP_ID="your-admin-group-id"
+OWNER_ID="your-developer-id"
 ```
 
 ### Start bot
