@@ -4,6 +4,7 @@ aiohappyeyeballs==2.4.6
 aiohttp==3.11.12
 aiosignal==1.3.2
 aiosqlite==0.21.0
+alembic==1.14.1
 annotated-types==0.7.0
 anyio==4.8.0
 attrs==25.1.0
@@ -24,7 +25,7 @@ eth_abi==5.2.0
 frozenlist==1.5.0
 google-auth==2.38.0
 google-auth-oauthlib==1.2.1
-greenlet==3.1.1
+greenlet @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_a6r9b0ikr4/croot/greenlet_1733860079251/work
 gspread==6.1.4
 h11==0.14.0
 hexbytes==1.3.0
@@ -32,6 +33,8 @@ httpcore==1.0.7
 httpx==0.28.1
 idna==3.10
 magic-filter==1.0.12
+Mako==1.3.9
+MarkupSafe==3.0.2
 multidict==6.1.0
 numpy==2.2.2
 oauthlib==3.2.2
