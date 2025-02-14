@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from models.command import CommandModel
 from models.report import ReportModel
+from models.base import BaseModel
 from general_config import config
 
 

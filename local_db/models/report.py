@@ -1,7 +1,7 @@
 from sqlalchemy import DateTime, Text
 from sqlalchemy.orm import mapped_column, Mapped
 from datetime import datetime, UTC
-from .base import BaseModel
+from local_db.models.base import BaseModel
 
 
 class ReportModel(BaseModel):

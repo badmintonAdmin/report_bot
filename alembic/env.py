@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from local_db.models.base import BaseModel
+from local_db.models import *
 from general_config import config as inter_con
 
 from alembic import context
@@ -22,6 +22,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+print(BaseModel.metadata)
 target_metadata = BaseModel.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -29,7 +30,10 @@ target_metadata = BaseModel.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option("sqlalchemy.url", inter_con.DATABASE_URL)
+config.set_main_option(
+    "sqlalchemy.url",
+    str(inter_con.DATABASE_URL),
+)
 
 
 def run_migrations_offline() -> None:
