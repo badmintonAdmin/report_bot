@@ -14,11 +14,11 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def create_command():
+async def get_command():
     async with AsyncSessionLocal() as session:
         await session.commit()
 
 
-async def create_report():
+async def get_report():
     async with AsyncSessionLocal() as session:
         await session.commit()
