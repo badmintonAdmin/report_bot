@@ -12,9 +12,8 @@ class Gsheet:
     def get_data(self, sheet_number: int):
         try:
             table = self.gc.open_by_key(self.table_id).get_worksheet(sheet_number)
-            data = table.get_all_values()
-            df = pd.DataFrame(data[1:], columns=data[0])
-            return df
+            data = pd.DataFrame(table.get_all_records())
+            return data
 
         except ValueError as ve:
             print(f"ValueError: {ve}")
