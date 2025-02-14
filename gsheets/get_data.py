@@ -12,7 +12,7 @@ def get_policies():
     if filtered_df.empty:
         return ["No pools to top up"]
     gen_content = ["*==Top Up Policies==*"]
-    now = pd.Timestamp.now()
+    now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
             f"{row['NO']}: (ID {row['id']}) | {row['name']} | DAYS: {(row['date'] - now).days}"
@@ -30,7 +30,7 @@ def get_pools():
     if filtered_df.empty:
         return ["No pools to top up"]
     gen_content = ["*==Top Up Pools==*"]
-    now = pd.Timestamp.now()
+    now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
             f"{row['NO']}: {row['name']} | DAYS: {(row['date'] - now).days}"
@@ -48,7 +48,7 @@ def get_loans():
     if filtered_df.empty:
         return ["No loan payments due"]
     gen_content = ["*==LANDX CREDIT GATEWAY==*"]
-    now = pd.Timestamp.now()
+    now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
             f"{row['NO']}:{row['name']} | Total due: {row['total']} | DAYS: {(row['date'] - now).days}"
@@ -66,7 +66,7 @@ def get_epoch():
     if filtered_df.empty:
         return ["No epochs to top up"]
     gen_content = ["*=== Top UP epochs ==*"]
-    now = pd.Timestamp.now()
+    now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
             f"Epoch: {row['Epoch']} | Chain: {row['Chain']} | DAYS: {(row['date'] - now).days}"
