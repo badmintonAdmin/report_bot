@@ -3,6 +3,8 @@ from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import pool
 from alembic import context
+from local_db.models.base import BaseModel
+from general_config import config as inter_conf
 
 
 config = context.config
@@ -10,12 +12,12 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = None
+target_metadata = BaseModel.metadata
 
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option("sqlalchemy.url", inter_conf.DATABASE_URL)
     context.configure(
         url=url,
         target_metadata=target_metadata,
