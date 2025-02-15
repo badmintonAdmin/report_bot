@@ -41,6 +41,7 @@ add json to folder gsheets/google.json
 This is a special file with access to a Google spreadsheet.
 
 ### Start bot
+The bot should simply start and run in the background, listening for events and executing commands, without being added to Apache Airflow or creating a DAG. On successful startup, the terminal should display the message Bot running.....
 ```bash
 python tg/run_bot.py
 ```
