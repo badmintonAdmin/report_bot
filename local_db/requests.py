@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 async def get_command():
     async with ldb.get_session() as session:
-        result = await session.scalar(select(CommandModel))
+        result = await session.scalars(select(CommandModel))
         print(result)
         return result
 
