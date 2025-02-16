@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, F
 from tg.core.base_bot import basebot
 from tg.core.handlers import router
+from tg.core.menu import set_bot_commands
 
 
 class LndxBot:
@@ -16,5 +17,6 @@ class LndxBot:
             print(f"Error sending message: {e}")
 
     async def run(self):
+        await set_bot_commands(self.bot)
         print("Bot running....")
         await self.dp.start_polling(self.bot)
