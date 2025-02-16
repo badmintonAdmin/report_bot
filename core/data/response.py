@@ -292,6 +292,16 @@ def exchange_balance(balance: pd.DataFrame, claimable: list[float]) -> list:
     return [bw_amount_str]
 
 
+def invest_balance(balance: pd.DataFrame) -> list:
+    if balance is None:
+        return ["INVESTMENTS: not data"]
+
+    invest = balance["amount_usd"].sum()
+    invest_amount = "{:,.0f}".format(invest)
+    invest_amount_str = f"INVESTMENTS  ${invest_amount}"
+    return [invest_amount_str]
+
+
 def private_sold(balance: pd.DataFrame) -> list:
     if balance.empty:
         return ["CASH OUT: NOT DATA"]

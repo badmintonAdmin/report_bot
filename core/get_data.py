@@ -13,6 +13,7 @@ def get_all_data():
         "arb_wallets_cTokens.sql",
         "private_balance.sql",
         "prices_cTokens.sql",
+        "staked.sql",
     ]
     db_data = {
         query.replace(".sql", ""): database.execute_query(query)
@@ -35,6 +36,7 @@ def get_all_data():
     big_arr.append(lndx_holders(db_data["holders_counts"]))
     big_arr.append(xToken_holders(db_data["holders_counts"]))
     big_arr.append(exchange_data)
+    big_arr.append(invest_balance(db_data["staked"]))
     cash_out.append(private_sold(db_data["private_balance"]))
 
     return big_arr, cash_out
