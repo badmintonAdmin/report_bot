@@ -57,5 +57,5 @@ report_logs/*.txt
 google.json
 *.zip
 
-# ignore bd SQLite
+# ignore db SQLite
 db.sqlite
