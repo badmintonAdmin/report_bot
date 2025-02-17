@@ -2,7 +2,7 @@ from local_db.models.command import CommandModel
 from local_db.models.report import ReportModel
 from local_db.models.topup import TopupModel
 from local_db.ldb import ldb
-from sqlalchemy import select
+from sqlalchemy import select, desc
 
 
 async def get_command():
@@ -14,7 +14,11 @@ async def get_command():
 
 async def get_report():
     async with ldb.get_session() as session:
-        await session.commit()
+        result = await session.execute(
+            select(ReportModel.report).order_by(desc(ReportModel.date)).limit(1)
+        )
+        report = result.scalar()
+        return report if report else None
 
 
 async def add_report(report, date):

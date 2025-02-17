@@ -9,6 +9,7 @@ from tg.utils.format_message import format_where_tokens
 from tg.utils.filter_data import apply_amount_filter
 from tg.core.access import IsAllowed
 from gsheets.template import all_format
+from local_db.requests import get_report
 
 router = Router()
 
@@ -31,12 +32,11 @@ async def help_command(message: types.Message):
 
 @router.message(Command("get_report"), IsAllowed())
 async def report_command(message: types.Message):
-    report_path = get_latest_file_by_date()
-    if report_path is None:
+    last_report = await get_report()
+    if last_report is None:
         report_content = "No reports found for today - please try again later."
     else:
-        with open(f"{config.report_folder}/{report_path}", "r") as file:
-            report_content = file.read()
+        report_content = last_report
     await message.answer(report_content)
 
 
