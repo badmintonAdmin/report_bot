@@ -56,4 +56,6 @@ Thumbs.db
 report_logs/*.txt
 google.json
 *.zip
-*.sqlite
+
+# ignore bd SQLite
+db.sqlite
