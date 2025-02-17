@@ -5,6 +5,7 @@ from core.run import get_report
 from tg.core.lndx_bot import LndxBot
 import asyncio
 from general_config import config
+from local_db.requests import add_report
 
 
 def generate_random_string(length=5):
@@ -15,15 +16,8 @@ async def save_report_to_log():
     report = get_report()
     bot = LndxBot()
 
-    today = datetime.today().strftime("%Y_%m_%d")
-    random_str = generate_random_string()
-    filename = f"report_logs/{today}_{random_str}.txt"
-
-    with open(filename, "w") as file:
-        file.write(report)
-
-    print(report)
-    print(f"Report saved as {filename}")
+    today = datetime.today()
+    await add_report(report, today)
 
     try:
         await bot.send_message(chat_id=config.OWNER_ID, text=report)
