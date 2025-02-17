@@ -40,6 +40,12 @@ OWNER_ID="your-developer-id"
 add json to folder gsheets/google.json
 This is a special file with access to a Google spreadsheet.
 
+### migrations
+Before starting the bot, you need to apply the database migrations. Run the following command to ensure your database schema is up to date:
+```bash
+python alembic upgrade head 
+```
+
 ### Start bot
 The bot should simply start and run in the background, listening for events and executing commands, without being added to Apache Airflow or creating a DAG. On successful startup, the terminal should display the message Bot running.....
 ```bash
