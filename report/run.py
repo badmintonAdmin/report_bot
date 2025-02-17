@@ -1,5 +1,5 @@
-from core.get_data import *
-from core.template import generate_report
+from report.get_data import *
+from report.template import generate_report
 
 
 def get_remote_report():

@@ -1,6 +1,6 @@
 from db import database
-from core.data.response import *
-from core.data.request_contract import *
+from report.data.response import *
+from report.data.request_contract import *
 
 
 def get_all_data():

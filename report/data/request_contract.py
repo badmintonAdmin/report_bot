@@ -1,5 +1,5 @@
 from contracts import contract_data
-from core.config_data import config_data
+from report.config_data import config_data
 import pandas as pd
 
 

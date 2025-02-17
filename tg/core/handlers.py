@@ -1,8 +1,6 @@
 from aiogram import types
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
-from tg.utils.find_report import get_latest_file_by_date
-from tg.config import general_config as config
 from tg.core.commands_list import commands as c
 from tg.query.get_data import where_tokens
 from tg.utils.format_message import format_where_tokens

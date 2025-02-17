@@ -1,7 +1,5 @@
-import random
-import string
 from datetime import datetime
-from core.run import get_remote_report
+from report.run import get_remote_report
 from tg.core.lndx_bot import LndxBot
 import asyncio
 from general_config import config
