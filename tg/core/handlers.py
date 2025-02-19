@@ -2,6 +2,8 @@ from aiogram import types
 from aiogram import F, Router
 from aiogram.enums import ChatAction
 from aiogram.filters import CommandStart, Command
+from aiogram.utils.chat_action import ChatActionSender
+
 from tg.core.commands_list import commands as c
 from tg.query.get_data import where_tokens
 from tg.utils.format_message import format_where_tokens
@@ -103,9 +105,8 @@ async def top_up(message: types.Message):
     processing_message = await message.answer(
         "⏳ Processing your request, please wait..."
     )
-    await message.bot.send_chat_action(
-        chat_id=message.chat.id, action=ChatAction.TYPING
-    )
+
+    await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
     text = all_format()
 
     await message.answer(text, parse_mode="Markdown")
