@@ -103,9 +103,10 @@ async def top_up(message: types.Message):
     processing_message = await message.answer(
         "⏳ Processing your request, please wait..."
     )
-    text = all_format()
     await message.bot.send_chat_action(
         chat_id=message.chat.id, action=ChatAction.TYPING
     )
+    text = all_format()
+
     await message.answer(text, parse_mode="Markdown")
     await processing_message.delete()
