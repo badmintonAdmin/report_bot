@@ -10,7 +10,7 @@ def get_policies():
         return ["The file with pools data is empty"]
     filtered_df = filtered(df, 3)
     if filtered_df.empty:
-        return ["No pools to top up"]
+        return ["No policies to top up"]
     gen_content = ["*==Top Up Policies==*"]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
