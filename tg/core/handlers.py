@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram import F, Router
+from aiogram.enums import ChatAction
 from aiogram.filters import CommandStart, Command
 from tg.core.commands_list import commands as c
 from tg.query.get_data import where_tokens
@@ -35,11 +36,17 @@ async def report_command(message: types.Message):
         report_content = "No reports found for today - please try again later."
     else:
         report_content = last_report
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id, action=ChatAction.TYPING
+    )
     await message.answer(report_content)
 
 
 @router.message(Command("where_tokens"), IsAllowed())
 async def get_tokens(message: types.Message):
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id, action=ChatAction.TYPING
+    )
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
         text = "⚠️ You did not specify any tokens. Use:\n\n```\n/where_tokens xBasket,USDC,USDT\n```"
@@ -47,6 +54,9 @@ async def get_tokens(message: types.Message):
         return
     processing_message = await message.answer(
         "⏳ Processing your request, please wait..."
+    )
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id, action=ChatAction.TYPING
     )
     tokens = choice_tokens[0].split(",")
     tokens = [token.lower().strip() for token in tokens]
@@ -94,5 +104,8 @@ async def top_up(message: types.Message):
         "⏳ Processing your request, please wait..."
     )
     text = all_format()
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id, action=ChatAction.TYPING
+    )
     await message.answer(text, parse_mode="Markdown")
     await processing_message.delete()
