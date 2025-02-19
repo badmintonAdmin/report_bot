@@ -1,14 +1,8 @@
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
-from general_config import config
 
 
 class BaseBot(Bot):
-    def __init__(self):
-        token = config.TOKEN
-        self.log = "../../report_logs"
+    def __init__(self, bot_token):
         default_properties = DefaultBotProperties(parse_mode="Markdown")
-        super().__init__(token=token, default=default_properties)
-
-
-basebot = BaseBot()
+        super().__init__(token=bot_token, default=default_properties)

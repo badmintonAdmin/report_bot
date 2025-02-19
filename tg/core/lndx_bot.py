@@ -1,12 +1,13 @@
 from aiogram import Dispatcher, F
-from tg.core.base_bot import basebot
+from tg.core.base_bot import BaseBot
 from tg.core.handlers import router
 from tg.core.menu import set_bot_commands
+from general_config import config
 
 
 class LndxBot:
     def __init__(self):
-        self.bot = basebot
+        self.bot = BaseBot(config.TOKEN)
         self.dp = Dispatcher()
         self.dp.include_router(router)
 
