@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram import types
 
-router = Router()
+router = Router(name=__name__)
 
 
 @router.message()
