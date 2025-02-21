@@ -11,8 +11,10 @@ from tg.utils.filter_data import apply_amount_filter
 from tg.core.access import IsAllowed
 from gsheets.template import all_format
 from local_db.requests import get_report
+from tg.core.routers import router as all_routers
 
 router = Router()
+router.include_router(all_routers)
 
 
 @router.message(CommandStart())
