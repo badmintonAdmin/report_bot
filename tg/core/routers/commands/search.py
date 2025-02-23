@@ -18,7 +18,7 @@ async def get_tokens(message: types.Message):
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
         text = "⚠️ You did not specify any tokens. Use:\n\n```\n/where_tokens xBasket,USDC,USDT\n```"
-        await message.answer(text, parse_mode="Markdown")
+        await message.answer(text)
         return
     processing_message = await message.answer(
         "⏳ Processing your request, please wait..."
@@ -59,8 +59,8 @@ async def send_long_message(message: types.Message, text: str, chunk_size=4000):
         if len(buffer) + len(paragraph) + 1 < chunk_size:
             buffer += paragraph + "\n"
         else:
-            await message.answer(buffer.strip(), parse_mode="Markdown")
+            await message.answer(buffer.strip())
             buffer = paragraph + "\n"
 
     if buffer.strip():
-        await message.answer(buffer.strip(), parse_mode="Markdown")
+        await message.answer(buffer.strip())

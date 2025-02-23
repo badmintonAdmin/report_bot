@@ -31,5 +31,5 @@ async def top_up(message: types.Message):
     await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
     text = all_format()
 
-    await message.answer(text, parse_mode="Markdown")
+    await message.answer(text)
     await processing_message.delete()
