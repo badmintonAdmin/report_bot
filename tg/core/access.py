@@ -1,4 +1,3 @@
-import os
 from aiogram.types import Message
 from aiogram.filters import BaseFilter
 from general_config import config

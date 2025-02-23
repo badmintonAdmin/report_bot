@@ -1,30 +1,13 @@
-from aiogram import types
+from aiogram import Router, types
 from aiogram.enums import ChatAction
 from aiogram.filters import Command
 
-from tg.core.routers.commands.base import router
-from tg.query.get_data import where_tokens
-from tg.utils.format_message import format_where_tokens
-from tg.utils.filter_data import apply_amount_filter
 from tg.core.access import IsAllowed
-from gsheets.template import all_format
-from local_db.requests import get_report
-from tg.core.routers import router as all_routers
+from tg.query.get_data import where_tokens
+from tg.utils.filter_data import apply_amount_filter
+from tg.utils.format_message import format_where_tokens
 
-router.include_router(all_routers)
-
-
-@router.message(Command("get_report"), IsAllowed())
-async def report_command(message: types.Message):
-    last_report = await get_report()
-    if last_report is None:
-        report_content = "No reports found for today - please try again later."
-    else:
-        report_content = last_report
-    await message.bot.send_chat_action(
-        chat_id=message.chat.id, action=ChatAction.TYPING
-    )
-    await message.answer(report_content)
+router = Router()
 
 
 @router.message(Command("where_tokens"), IsAllowed())
@@ -81,16 +64,3 @@ async def send_long_message(message: types.Message, text: str, chunk_size=4000):
 
     if buffer.strip():
         await message.answer(buffer.strip(), parse_mode="Markdown")
-
-
-@router.message(Command("get_topup"), IsAllowed())
-async def top_up(message: types.Message):
-    processing_message = await message.answer(
-        "⏳ Processing your request, please wait..."
-    )
-
-    await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
-    text = all_format()
-
-    await message.answer(text, parse_mode="Markdown")
-    await processing_message.delete()

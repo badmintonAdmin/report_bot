@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, F
 from tg.core.base_bot import BaseBot
-from tg.core.handlers import router
+from tg.core.routers import router
 from tg.core.menu import set_bot_commands
 from general_config import config
 
