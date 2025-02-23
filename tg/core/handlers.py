@@ -1,10 +1,8 @@
 from aiogram import types
-from aiogram import F, Router
 from aiogram.enums import ChatAction
-from aiogram.filters import CommandStart, Command
-from aiogram.utils.chat_action import ChatActionSender
+from aiogram.filters import Command
 
-from tg.core.commands_list import commands as c
+from tg.core.routers.commands.base import router
 from tg.query.get_data import where_tokens
 from tg.utils.format_message import format_where_tokens
 from tg.utils.filter_data import apply_amount_filter
@@ -13,24 +11,7 @@ from gsheets.template import all_format
 from local_db.requests import get_report
 from tg.core.routers import router as all_routers
 
-router = Router()
 router.include_router(all_routers)
-
-
-@router.message(CommandStart())
-async def start_command(message: types.Message):
-    await message.answer(
-        "Hello! I'm LandX bot.\n"
-        "Send the command /help to get a list of all commands."
-    )
-
-
-@router.message(Command("help"), IsAllowed())
-async def help_command(message: types.Message):
-    help_text = "Here are the available commands:\n\n"
-    for command, description in c.items():
-        help_text += f"{command}: {description}\n"
-    await message.answer(help_text, parse_mode=None)
 
 
 @router.message(Command("get_report"), IsAllowed())
