@@ -70,7 +70,8 @@ def get_epoch():
         return text
     filtered_df = filtered(df, 3)
     if filtered_df.empty:
-        return [m.hbold("No epochs to top up")]
+        text = [m.hbold("No epochs to top up"), "=" * 32]
+        return text
     gen_content = [m.hbold("=== Top UP epochs ==")]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
