@@ -2,6 +2,7 @@ from gsheets.data_request import gsheet
 from general_config import config
 import pandas as pd
 from datetime import timedelta
+from aiogram.utils import markdown as m
 
 
 def get_policies():
@@ -10,8 +11,9 @@ def get_policies():
         return ["The file with pools data is empty"]
     filtered_df = filtered(df, 3)
     if filtered_df.empty:
-        return ["No policies to top up"]
-    gen_content = ["*==Top Up Policies==*"]
+        text = [m.hbold("No policies to top up"), "=" * 32]
+        return text
+    gen_content = [m.hbold("==Top Up Policies==")]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
@@ -25,11 +27,13 @@ def get_policies():
 def get_pools():
     df = gsheet.get_data(int(config.POOLS))
     if df.empty:
-        return ["The file with pools data is empty"]
+        text = [m.hbold("The file with pools data is empty"), "=" * 32]
+        return text
     filtered_df = filtered(df, 5)
     if filtered_df.empty:
-        return ["No pools to top up"]
-    gen_content = ["*==Top Up Pools==*"]
+        text = [m.hbold("No pools to top up"), "=" * 32]
+        return text
+    gen_content = [m.hbold("==Top Up Pools==")]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
@@ -43,11 +47,12 @@ def get_pools():
 def get_loans():
     df = gsheet.get_data(int(config.LOANS))
     if df.empty:
-        return ["The file with loans data is empty"]
+        return [m.hbold("The file with loans data is empty")]
     filtered_df = filtered(df, 5)
     if filtered_df.empty:
-        return ["No loan payments due"]
-    gen_content = ["*==LANDX CREDIT GATEWAY==*"]
+        text = [m.hbold("No loan payments due"), "=" * 32]
+        return text
+    gen_content = [m.hbold("==LANDX CREDIT GATEWAY==")]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(
@@ -61,11 +66,12 @@ def get_loans():
 def get_epoch():
     df = gsheet.get_data(int(config.EPOCH))
     if df.empty:
-        return ["The file with epoch data is empty"]
+        text = [m.hbold("The file with epoch data is empty"), "=" * 32]
+        return text
     filtered_df = filtered(df, 3)
     if filtered_df.empty:
-        return ["No epochs to top up"]
-    gen_content = ["*=== Top UP epochs ==*"]
+        return [m.hbold("No epochs to top up")]
+    gen_content = [m.hbold("=== Top UP epochs ==")]
     now = pd.Timestamp.now().normalize()
     for i, row in filtered_df.iterrows():
         gen_content.append(

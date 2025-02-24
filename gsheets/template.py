@@ -1,9 +1,10 @@
 from gsheets.get_data import *
 from datetime import datetime
+from aiogram.utils import markdown as m
 
 
 def all_format():
-    current_date = datetime.now().strftime("*Top-Up Requirements %B %d, %Y*")
+    current_date = datetime.now().strftime(m.hbold("Top-Up Requirements %B %d, %Y"))
     title = [current_date, ""]
     policies = get_policies()
     pools = get_pools()
