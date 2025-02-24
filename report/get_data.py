@@ -1,6 +1,6 @@
 from db import database
-from report.data.response import *
-from report.data.request_contract import *
+import report.data.response as res
+import report.data.request_contract as con
 
 
 def get_all_data():
@@ -21,22 +21,24 @@ def get_all_data():
     }
     database.close_connection()
 
-    xTokens_data = get_xTokens_info()
-    cTokens_data = get_cTokens_info()
-    claimable = all_contract_data(xTokens_data, cTokens_data, db_data["prices_cTokens"])
-    exchange_data = exchange_balance(db_data["arb_wallets_cTokens"], claimable)
+    xTokens_data = con.get_xTokens_info()
+    cTokens_data = con.get_cTokens_info()
+    claimable = res.all_contract_data(
+        xTokens_data, cTokens_data, db_data["prices_cTokens"]
+    )
+    exchange_data = res.exchange_balance(db_data["arb_wallets_cTokens"], claimable)
 
-    big_arr.append(all_tokens_to_usd(db_data["main"]))
-    big_arr.append(all_liquid_tokens_to_usd(db_data["main"]))
-    big_arr.append(lndx_amount(db_data["main"], db_data["lndx_pools_balance"]))
-    big_arr.append(amount_usd(db_data["main"]))
-    big_arr.append(amount_eth(db_data["main"]))
-    big_arr.append(amount_btc(db_data["main"]))
-    big_arr.append(xTokens_change(db_data["main"]))
-    big_arr.append(lndx_holders(db_data["holders_counts"]))
-    big_arr.append(xToken_holders(db_data["holders_counts"]))
+    big_arr.append(res.all_tokens_to_usd(db_data["main"]))
+    big_arr.append(res.all_liquid_tokens_to_usd(db_data["main"]))
+    big_arr.append(res.lndx_amount(db_data["main"], db_data["lndx_pools_balance"]))
+    big_arr.append(res.amount_usd(db_data["main"]))
+    big_arr.append(res.amount_eth(db_data["main"]))
+    big_arr.append(res.amount_btc(db_data["main"]))
+    big_arr.append(res.xTokens_change(db_data["main"]))
+    big_arr.append(res.lndx_holders(db_data["holders_counts"]))
+    big_arr.append(res.xToken_holders(db_data["holders_counts"]))
     big_arr.append(exchange_data)
-    big_arr.append(invest_balance(db_data["staked"]))
-    cash_out.append(private_sold(db_data["private_balance"]))
+    big_arr.append(res.invest_balance(db_data["staked"]))
+    cash_out.append(res.private_sold(db_data["private_balance"]))
 
     return big_arr, cash_out
