@@ -1,9 +1,10 @@
 from datetime import datetime
+from aiogram.utils import markdown as m
 
 
 def generate_report(big_arr, cash_out):
     today = datetime.today().strftime("%B %d, %Y")
-    report = [f"*Balance Change Report for {today}*\n"]
+    report = [m.hbold(f"Balance Change Report for {today}\n")]
     big_arr = flatten_list(big_arr)
 
     for i, item in enumerate(big_arr, start=1):
@@ -14,7 +15,7 @@ def generate_report(big_arr, cash_out):
         report.append(f"{cash_out[0][0]}")
     else:
         report.append(f"\n")
-        report.append("*==========CASH OUT============*")
+        report.append(m.hbold("==========CASH OUT============"))
         report.append(f"LNDX Sold    | {cash_out[0][-1]}")
         report.append(f"Wallets Sold | {cash_out[0][0]}")
         report.append(f"=" * 32)
