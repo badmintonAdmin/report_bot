@@ -6,6 +6,7 @@ from tg.core.access import IsAllowed
 from tg.query.get_data import where_tokens
 from tg.utils.filter_data import apply_amount_filter
 from tg.utils.format_message import format_where_tokens
+from aiogram.utils.markdown import hpre
 
 router = Router()
 
@@ -17,7 +18,8 @@ async def get_tokens(message: types.Message):
     )
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
-        text = "⚠️ You did not specify any tokens. Use:\n\n```\n/where_tokens xBasket,USDC,USDT\n```"
+        text = f"""⚠️ You did not specify any tokens. Use:
+        {hpre("/where_tokens xBasket,USDC,USDT")}"""
         await message.answer(text)
         return
     processing_message = await message.answer(
