@@ -19,7 +19,7 @@ async def get_tokens(message: types.Message):
     choice_tokens = message.text.split()[1:]
     if not choice_tokens:
         text = f"""⚠️ You did not specify any tokens. Use:
-        {hpre("/where_tokens xBasket,USDC,USDT")}"""
+        {hpre("/where_tokens xBasket,USDC,USDT >5")}"""
         await message.answer(text)
         return
     processing_message = await message.answer(
