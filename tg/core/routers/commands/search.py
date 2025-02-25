@@ -7,8 +7,49 @@ from tg.query.get_data import where_tokens
 from tg.utils.filter_data import apply_amount_filter
 from tg.utils.format_message import format_where_tokens
 from aiogram.utils.markdown import hpre
+from apis.coingecko.main import get_token_price
+from aiogram.utils import markdown as m
+from apis.coingecko.ids_coins_alias import coins_alias
+
 
 router = Router()
+
+
+@router.message(Command("price"), IsAllowed())
+async def get_price_command(message: types.Message):
+    tokens = "landx-governance-token"
+    search = message.text.split()
+
+    if len(search) > 1:
+        user_tokens = search[1].split(",")
+        choices = [
+            coins_alias[token.strip().upper()]
+            if token.strip().upper() in coins_alias
+            else token.strip()
+            for token in user_tokens
+        ]
+        tokens = ",".join(choices)
+
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id, action=ChatAction.TYPING
+    )
+    price_data = get_token_price(tokens)
+    if not price_data:  #
+        await message.answer("Prices for tokens were not found on CoinGecko.")
+    else:
+        price_text = "\n".join(
+            [
+                f"{next((k for k, v in coins_alias.items() if v == token), token).upper()}: ${data['usd']}"
+                for token, data in price_data.items()
+            ]
+        )
+        await message.answer(
+            f"{m.hbold('Current prices:')}\n"
+            "=======\n"
+            f"{price_text}\n"
+            "=======\n"
+            f"{m.hitalic('from CoinGecko')}"
+        )
 
 
 @router.message(Command("where_tokens"), IsAllowed())
