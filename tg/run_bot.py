@@ -1,7 +1,5 @@
 import asyncio
 
-from cytoolz.functoolz import return_none
-
 from tg.core.lndx_bot import LndxBot
 import logging
 
