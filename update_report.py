@@ -13,7 +13,7 @@ async def save_report_to_log():
     today = datetime.today()
     await add_report(report, today)
     try:
-        await bot.send_message(chat_id=config.OWNER_ID, text=report)
+        await bot.send_message(chat_id=config.ALLOWED_GROUP_ID, text=report)
     finally:
         await bot.bot.session.close()
 
