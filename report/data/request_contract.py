@@ -41,7 +41,7 @@ def get_lcg_info():
     staked = staked["total_staked"] / 1e6
     available = available["balance"] / 1e6
     avg_apr = borrow_data["borrow_apr"] / 100
-    apr = borrowed * avg_apr / staked
+    apr = borrowed * avg_apr / staked - 0.5
     arr = []
     arr.append(
         {
