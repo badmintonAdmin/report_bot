@@ -67,3 +67,7 @@ def format_epoch_rows(df: pd.DataFrame) -> List[str]:
         result.append("=" * 32)
 
     return result
+
+
+def get_lcg_data():
+    return 1

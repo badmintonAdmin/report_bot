@@ -93,7 +93,8 @@ class ContractData:
             return None
         try:
             total_borrowed = contract.functions.totalBorrowed().call()
-            return {"total_borrowed": total_borrowed}
+            borrow_apr = contract.functions.getCurrentWeightedAverageRate().call()
+            return {"total_borrowed": total_borrowed, "borrow_apr": borrow_apr}
         except Exception as e:
             print(f"Error interacting with borrower contract: {e}")
             return None
@@ -109,6 +110,17 @@ class ContractData:
             return {"total_staked": total_staked}
         except Exception as e:
             print(f"Error interacting with staking contract: {e}")
+            return None
+
+    def get_available(self, contract_address=config.eth_usdc):
+        contract = self.contract_factory(contract_address, "eth_usdc.json", "eth")
+        if not contract:
+            return None
+        try:
+            balance = contract.functions.balanceOf(config.eth_lcg_vault).call()
+            return {"balance": balance}
+        except Exception as e:
+            print(f"Error interacting with USDC contract: {e}")
             return None
 
 

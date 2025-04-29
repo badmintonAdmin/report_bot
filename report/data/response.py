@@ -322,3 +322,13 @@ def private_sold(balance: pd.DataFrame) -> list:
     arr.append(f"{total_sold:,.2f}")
 
     return arr
+
+
+def lcg_data(lcg: pd.DataFrame) -> list:
+    if lcg.empty:
+        return ["LCG: NOT DATA"]
+
+    row = lcg.iloc[0]
+    str_line = f"LCG Available USDC: {row['available']:,.2f} | APR: {row['apr']:,.2f}%"
+
+    return [str_line]

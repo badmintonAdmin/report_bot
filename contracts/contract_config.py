@@ -10,6 +10,7 @@ class ContractConfig(Config):
         self.eth_lcg_borrower = "0x2280BE9E5e37Ba1dA98bD1086bAb8B78697C9Fde"
         self.eth_lcg_staking = "0x134ee64cCF2151452B0fBd757f9aE1a09304036B"
         self.eth_lcg_vault = "0xe5d2eB7f4f1ecFA1113E8A5b5c6DF42d8376460f"
+        self.eth_usdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 
 
 config = ContractConfig()

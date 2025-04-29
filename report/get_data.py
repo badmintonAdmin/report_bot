@@ -1,6 +1,7 @@
 from db import database
 import report.data.response as res
 import report.data.request_contract as con
+from report.data.response import lcg_data
 
 
 def get_all_data():
@@ -21,6 +22,9 @@ def get_all_data():
     }
     database.close_connection()
 
+    lcg_data = con.get_lcg_info()
+    lcg = res.lcg_data(lcg_data)
+
     xTokens_data = con.get_xTokens_info()
     cTokens_data = con.get_cTokens_info()
     claimable = res.all_contract_data(
@@ -38,6 +42,7 @@ def get_all_data():
     big_arr.append(res.lndx_holders(db_data["holders_counts"]))
     big_arr.append(res.xToken_holders(db_data["holders_counts"]))
     big_arr.append(exchange_data)
+    big_arr.append(lcg)
     big_arr.append(res.invest_balance(db_data["staked"]))
     cash_out.append(res.private_sold(db_data["private_balance"]))
 
