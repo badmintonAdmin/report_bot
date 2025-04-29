@@ -63,23 +63,23 @@ def get_loans():
     return gen_content
 
 
-def get_epoch():
-    df = gsheet.get_data(int(config.EPOCH))
-    if df.empty:
-        text = [m.hbold("The file with epoch data is empty"), "=" * 32]
-        return text
-    filtered_df = filtered(df, 3)
-    if filtered_df.empty:
-        text = [m.hbold("No epochs to top up"), "=" * 32]
-        return text
-    gen_content = [m.hbold("=== Top UP epochs ==")]
-    now = pd.Timestamp.now().normalize()
-    for i, row in filtered_df.iterrows():
-        gen_content.append(
-            f"Epoch: {row['Epoch']} | Chain: {row['Chain']} | DAYS: {(row['date'] - now).days}"
-        )
-        gen_content.append("=" * 32)
-    return gen_content
+# def get_epoch():
+#     df = gsheet.get_data(int(config.EPOCH))
+#     if df.empty:
+#         text = [m.hbold("The file with epoch data is empty"), "=" * 32]
+#         return text
+#     filtered_df = filtered(df, 3)
+#     if filtered_df.empty:
+#         text = [m.hbold("No epochs to top up"), "=" * 32]
+#         return text
+#     gen_content = [m.hbold("=== Top UP epochs ==")]
+#     now = pd.Timestamp.now().normalize()
+#     for i, row in filtered_df.iterrows():
+#         gen_content.append(
+#             f"Epoch: {row['Epoch']} | Chain: {row['Chain']} | DAYS: {(row['date'] - now).days}"
+#         )
+#         gen_content.append("=" * 32)
+#     return gen_content
 
 
 def filtered(df: pd.DataFrame, days: int):
