@@ -5,7 +5,6 @@ from aiogram.filters import Command
 from gsheets.template import all_format
 from local_db.requests import get_report
 from tg.core.access import IsAllowed
-from report.data.request_contract import get_lcg_info
 
 router = Router()
 
@@ -43,9 +42,7 @@ async def top_up(message: types.Message):
     )
 
     await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
-    lcg_info = get_lcg_info()
-    print(lcg_info)
-    text = "12123"
 
+    text = "Coming soon..."
     await message.answer(text)
     await processing_message.delete()
