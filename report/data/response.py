@@ -278,8 +278,7 @@ def all_contract_data(
 def exchange_balance(balance: pd.DataFrame, claimable: list[float]) -> list:
     if balance is None:
         return ["ARBITRUM EXCHANGE: not data"]
-
-    balance_wallets = balance.query('asset=="USDC"')
+    balance_wallets = balance.query('asset == "USDC" and network == "arb"')
 
     bw_amount = balance_wallets["balance"].iloc[-1]
     bw_amount = "{:,.0f}".format(bw_amount)
