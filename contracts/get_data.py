@@ -15,7 +15,7 @@ def get_epoch() -> Union[List[str], None]:
     eth_epoch = contract_data.get_epoch("eth")
 
     if not arb_epoch or not eth_epoch:
-        return [m.hbold("Ошибка получения epoch данных"), "=" * 32]
+        return [m.hbold("Error to get epoch data"), "=" * 32]
 
     epochs = {
         "arb": arb_epoch,
