@@ -80,7 +80,8 @@ class ContractData:
 
         try:
             epoch = contract.functions.getCurrentEpoch().call()
-            return {"epoch": epoch}
+            next_epoch = contract.functions.epoch(epoch[0] + 1).call()
+            return {"epoch": epoch, "next_epoch": next_epoch}
         except Exception as e:
             print(f"Error interacting with epoch contract: {e}")
             return None

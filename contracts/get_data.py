@@ -13,7 +13,6 @@ DAYS_THRESHOLD = 3
 def get_epoch() -> Union[List[str], None]:
     arb_epoch = contract_data.get_epoch("arb")
     eth_epoch = contract_data.get_epoch("eth")
-
     if not arb_epoch or not eth_epoch:
         return [m.hbold("Error to get epoch data"), "=" * 32]
 
@@ -25,6 +24,7 @@ def get_epoch() -> Union[List[str], None]:
     rows = []
     for chain, info in epochs.items():
         epoch_number, start_ts, end_ts = info["epoch"]
+        next_epoch = info["next_epoch"][0]
         start_date = datetime.fromtimestamp(start_ts, tz=timezone.utc)
         end_date = datetime.fromtimestamp(end_ts, tz=timezone.utc)
         rows.append(
@@ -33,6 +33,7 @@ def get_epoch() -> Union[List[str], None]:
                 "Epoch": epoch_number,
                 "StartDate": start_date,
                 "EndDate": end_date,
+                "done": True if next_epoch > 0 else False,
             }
         )
 
@@ -52,7 +53,7 @@ def get_epoch() -> Union[List[str], None]:
 def filter_epochs(df: pd.DataFrame, days: int) -> pd.DataFrame:
     df["EndDate"] = pd.to_datetime(df["EndDate"], errors="coerce")
     deadline = pd.Timestamp.now(tz=timezone.utc) + timedelta(days=days)
-    return df[df["EndDate"] <= deadline]
+    return df[(df["EndDate"] <= deadline) & (df["done"] == False)].copy()
 
 
 def format_epoch_rows(df: pd.DataFrame) -> List[str]:
@@ -71,3 +72,6 @@ def format_epoch_rows(df: pd.DataFrame) -> List[str]:
 
 def get_lcg_data():
     return 1
+
+
+get_epoch()
