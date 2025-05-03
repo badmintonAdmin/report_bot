@@ -7,7 +7,7 @@ from aiogram.utils import markdown as m
 from contracts.contract_data import contract_data
 
 
-DAYS_THRESHOLD = 3
+DAYS_THRESHOLD = 4
 
 
 def get_epoch() -> Union[List[str], None]:
