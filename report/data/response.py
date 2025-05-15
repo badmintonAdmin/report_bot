@@ -39,16 +39,30 @@ def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
     filtered_data = data[~data["tokens"].isin(values_to_remove)]
 
     all_liquid_tokens = (
-        filtered_data.groupby("date")[["total_balance_usd", "abs_diff_usd"]]
+        filtered_data.groupby(["date"])[["total_balance_usd", "abs_diff_usd"]]
         .sum()
         .iloc[0]
     )
+    all_group_tokens = filtered_data.groupby(["main"])[
+        ["total_balance_usd", "abs_diff_usd"]
+    ].sum()
+
+    group_lines = []
+
+    for index, row in all_group_tokens.iterrows():
+        name = index
+        total_balance = row["total_balance_usd"]
+        abs_diff = row["abs_diff_usd"]
+        group_lines.append(f"--{name}: ${total_balance:,.2f} | {abs_diff:,.2f}")
+
+    groups = "\n".join(group_lines)
 
     diff_sign = "-$" if all_liquid_tokens["abs_diff_usd"] < 0 else "+$"
 
     final_all_token_liq_usd = (
         f"LIQUID ASSETS {diff_sign}{abs(all_liquid_tokens['abs_diff_usd']):,.2f} | "
-        f"${all_liquid_tokens['total_balance_usd']:,.2f}"
+        f"${all_liquid_tokens['total_balance_usd']:,.2f} \n"
+        f"{groups}"
     )
 
     return [final_all_token_liq_usd]
