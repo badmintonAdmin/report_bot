@@ -57,7 +57,7 @@ async def top_up(message: types.Message):
     data = get_aave_data()
     row = data.iloc[0]
     str_line = (
-        f"<b>AAVE inforamtion:</b>\n"
+        f"<b>AAVE information:</b>\n"
         f"Supply: ${row['supply']:,.2f}\n"
         f"Borrowed: ${row['borrowed']:,.2f}\n"
         f"Net: ${row['net']:,.2f}\n"
