@@ -356,9 +356,9 @@ def aave_data(aave: pd.Series) -> list:
     row = aave.iloc[0]
 
     str_line = (
-        f"AAVE supply: {row['supply']:,.2f} | "
-        f"Borrowed: {row['borrowed']:,.2f} | "
-        f"Health Factor: {row['hf']:,.2f}"
+        f"AAVE supply: ${row['supply']:,.2f} | "
+        f"Borrowed: ${row['borrowed']:,.2f} | "
+        f"HF: {row['hf']:,.2f}"
     )
 
     return [str_line]
