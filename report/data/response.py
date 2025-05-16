@@ -347,3 +347,18 @@ def lcg_data(lcg: pd.DataFrame) -> list:
     str_line = f"LCG Available USDC: {row['available']:,.2f} | APR: {row['apr']:,.2f}%"
 
     return [str_line]
+
+
+def aave_data(aave: pd.Series) -> list:
+    if aave.empty:
+        return ["AAVE: NOT DATA"]
+
+    row = aave.iloc[0]
+
+    str_line = (
+        f"AAVE supply: {row['supply']:,.2f} | "
+        f"Borrowed: {row['borrowed']:,.2f} | "
+        f"Health Factor: {row['hf']:,.2f}"
+    )
+
+    return [str_line]

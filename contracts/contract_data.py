@@ -142,7 +142,7 @@ class ContractData:
                 "hf": user_data[5] / 1e18,
             }
 
-            return {"user_data": data}
+            return data
 
         except Exception as e:
             print(f"Error interacting with Aave contract: {e}")

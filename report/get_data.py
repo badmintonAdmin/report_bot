@@ -24,6 +24,7 @@ def get_all_data():
 
     lcg_data = con.get_lcg_info()
     lcg = res.lcg_data(lcg_data)
+    aave = res.aave_data(con.get_aave_data())
 
     xTokens_data = con.get_xTokens_info()
     cTokens_data = con.get_cTokens_info()
@@ -34,6 +35,7 @@ def get_all_data():
 
     big_arr.append(res.all_tokens_to_usd(db_data["main"]))
     big_arr.append(res.all_liquid_tokens_to_usd(db_data["main"]))
+    big_arr.append(aave)
     big_arr.append(res.lndx_amount(db_data["main"], db_data["lndx_pools_balance"]))
     big_arr.append(res.amount_usd(db_data["main"]))
     big_arr.append(res.amount_eth(db_data["main"]))
