@@ -54,3 +54,9 @@ def get_lcg_info():
 
     df = pd.DataFrame(arr)
     return df
+
+
+def get_aave_data():
+    data = contract_data.get_aave_data()
+    df = pd.DataFrame(data)
+    return df
