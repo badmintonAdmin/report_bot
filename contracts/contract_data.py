@@ -124,5 +124,29 @@ class ContractData:
             print(f"Error interacting with USDC contract: {e}")
             return None
 
+    def get_aave_data(self, contract_address=config.eth_aave):
+        contract = self.contract_factory(contract_address, "aave_v3_eth.json", "eth")
+        if not contract:
+            return None
+
+        try:
+            user_data = contract.functions.getUserAccountData(config.dao).call()
+            if not user_data or all(v == 0 for v in user_data):
+                print("No Aave data returned (all zero).")
+                return None
+
+            data = {
+                "supply": user_data[0] / 1e8,
+                "borrowed": user_data[1] / 1e8,
+                "net": user_data[0] / 1e8 - user_data[1] / 1e8,
+                "hf": user_data[5] / 1e18,
+            }
+
+            return {"user_data": data}
+
+        except Exception as e:
+            print(f"Error interacting with Aave contract: {e}")
+            return None
+
 
 contract_data = ContractData()
