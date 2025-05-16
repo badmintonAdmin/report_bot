@@ -5,4 +5,5 @@ commands = {
     "Search": "=============",
     "/where_tokens": "Retrieves info on specified tokens. List tokens separated by commas without spaces (e.g., /where_tokens xBasket,USDC,USDT >1).",
     "/price": "Retrieves current prices for specified tokens. List tokens separated by commas without spaces (e.g., /price LNDX,eth).",
+    "/aave": "The command displays the user's current status on AAVE: supply, borrowed amount, net balance, and health factor.",
 }
