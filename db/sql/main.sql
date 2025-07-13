@@ -101,6 +101,7 @@ mm_balance_wallets AS (
   FROM wallet_balances b
   INNER JOIN mm_Wallets_FD s
     ON b.wallet_id = s.id
+  WHERE b.price <> 0
   GROUP BY 1, 2, 3, 4
 ),
 mm_balance_wallets_lagged AS (
