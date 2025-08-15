@@ -36,6 +36,7 @@ def all_liquid_tokens_to_usd(data: pd.DataFrame) -> list:
         "wLNDX",
         "ETHG",
         "aEthWBTC",
+        "aEthWETH",
     }
     filtered_data = data[~data["tokens"].isin(values_to_remove)]
 
