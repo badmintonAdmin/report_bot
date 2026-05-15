@@ -70,6 +70,78 @@ def format_epoch_rows(df: pd.DataFrame) -> List[str]:
     return result
 
 
+LOANS_DAYS_THRESHOLD = 5
+
+
+def short_addr(addr: str) -> str:
+    if not isinstance(addr, str) or len(addr) < 10:
+        return str(addr)
+    return f"{addr[:6]}…{addr[-4:]}"
+
+
+def get_lcg_loans() -> List[str]:
+    loans = contract_data.get_lcg_loans()
+    if loans is None:
+        return [m.hbold("Error to get LCG loans data"), "=" * 32]
+    if not loans:
+        return [m.hbold("No loan payments due"), "=" * 32]
+
+    rows = []
+    for loan in loans:
+        unpaid = loan.get("unpaid_periods", 0)
+        if loan["next_interest_ts"] > 0 and (loan["interest_due"] > 0 or unpaid > 0):
+            rows.append(
+                {
+                    "id": loan["id"],
+                    "borrower": loan["borrower"],
+                    "kind": "Interest",
+                    "amount_usdc": loan["interest_due"] / 1e6,
+                    "due_ts": loan["next_interest_ts"],
+                    "unpaid_periods": unpaid,
+                }
+            )
+        if loan["maturity_ts"] > 0 and loan["principal_debt"] > 0:
+            rows.append(
+                {
+                    "id": loan["id"],
+                    "borrower": loan["borrower"],
+                    "kind": "Principal",
+                    "amount_usdc": loan["principal_debt"] / 1e6,
+                    "due_ts": loan["maturity_ts"],
+                    "unpaid_periods": 0,
+                }
+            )
+
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return [m.hbold("No loan payments due"), "=" * 32]
+
+    df["due_date"] = pd.to_datetime(df["due_ts"], unit="s", utc=True)
+    deadline = pd.Timestamp.now(tz=timezone.utc) + timedelta(days=LOANS_DAYS_THRESHOLD)
+    df = df[df["due_date"] <= deadline].copy()
+
+    if df.empty:
+        return [m.hbold("No loan payments due"), "=" * 32]
+
+    now = pd.Timestamp.now(tz=timezone.utc).normalize()
+    result = [m.hbold("==LANDX CREDIT GATEWAY==")]
+    for _, row in df.iterrows():
+        days_left = (row["due_date"] - now).days
+        overdue_flag = (
+            f" | OVERDUE: {row['unpaid_periods']} period(s)"
+            if row["unpaid_periods"] and row["unpaid_periods"] > 0
+            else ""
+        )
+        result.append(
+            f"{row['id']}: {short_addr(row['borrower'])} | "
+            f"{row['kind']} due: ${row['amount_usdc']:,.2f} | "
+            f"DAYS: {days_left}{overdue_flag}"
+        )
+        result.append("=" * 32)
+
+    return result
+
+
 def get_lcg_data():
     return 1
 

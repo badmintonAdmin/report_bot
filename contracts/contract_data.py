@@ -1,7 +1,17 @@
 import os
 import json
+import time
 from web3 import Web3
+from sqlalchemy import select
+
 from contracts.contract_config import config
+from local_db.sync_ldb import sync_session
+from local_db.models.lcg_loan import LCGLoanModel
+from local_db.models.sync_state import SyncStateModel
+
+LCG_BORROWER_LAST_BLOCK_KEY = "lcg_borrower_last_block"
+LCG_EVENT_NAMES = ("Opened", "Borrowed", "InterestPaid", "Repaid")
+GETLOGS_CHUNK = 9000
 
 
 class ContractData:
@@ -98,6 +108,156 @@ class ContractData:
             return {"total_borrowed": total_borrowed, "borrow_apr": borrow_apr}
         except Exception as e:
             print(f"Error interacting with borrower contract: {e}")
+            return None
+
+    def _fetch_loan_struct(self, contract, loan_id: int) -> dict:
+        row = contract.functions.loans(loan_id).call()
+        return {
+            "id": loan_id,
+            "borrower": row[0],
+            "amount": row[1],
+            "annual_rate": row[2],
+            "interest_payment_period": row[3],
+            "duration": row[4],
+            "borrowed_at": row[5],
+            "principal_debt": row[6],
+            "borrowed": row[7],
+            "repaid": row[8],
+            "days_in_period_paid": row[9],
+            "last_interest_paid_at": row[10],
+        }
+
+    def _affected_loan_ids_from_events(
+        self, contract, from_block: int, to_block: int
+    ) -> set:
+        affected = set()
+        for event_name in LCG_EVENT_NAMES:
+            event = getattr(contract.events, event_name)
+            cursor = from_block
+            while cursor <= to_block:
+                chunk_end = min(cursor + GETLOGS_CHUNK, to_block)
+                logs = event.get_logs(from_block=cursor, to_block=chunk_end)
+                for log in logs:
+                    affected.add(int(log.args.creditLineID))
+                cursor = chunk_end + 1
+        return affected
+
+    def get_lcg_loans(self, contract_address=config.eth_lcg_borrower):
+        contract = self.contract_factory(
+            contract_address, "eth_lcg_borrower.json", "eth"
+        )
+        if not contract:
+            return None
+        try:
+            current_block = self.provider_eth.eth.block_number
+
+            with sync_session() as session:
+                state = session.get(SyncStateModel, LCG_BORROWER_LAST_BLOCK_KEY)
+                last_block = int(state.value) if state else None
+
+                if last_block is None:
+                    count = contract.functions.loansCount().call()
+                    affected_ids = set(range(count))
+                    print(f"[lcg cache] bootstrap: syncing {count} loans")
+                else:
+                    affected_ids = self._affected_loan_ids_from_events(
+                        contract, last_block + 1, current_block
+                    )
+                    print(
+                        f"[lcg cache] incremental: blocks {last_block+1}..{current_block} "
+                        f"-> {len(affected_ids)} affected loan(s)"
+                    )
+
+                for loan_id in sorted(affected_ids):
+                    data = self._fetch_loan_struct(contract, loan_id)
+                    cached = session.get(LCGLoanModel, loan_id)
+                    if cached is None:
+                        session.add(LCGLoanModel(**data))
+                    else:
+                        for key, value in data.items():
+                            if key != "id":
+                                setattr(cached, key, value)
+
+                if state is None:
+                    session.add(
+                        SyncStateModel(
+                            id=LCG_BORROWER_LAST_BLOCK_KEY, value=str(current_block)
+                        )
+                    )
+                else:
+                    state.value = str(current_block)
+
+                session.commit()
+
+                now_ts = int(time.time())
+                cached_loans = (
+                    session.scalars(select(LCGLoanModel).order_by(LCGLoanModel.id))
+                    .all()
+                )
+
+                dynamic_refreshed = 0
+                for c in cached_loans:
+                    if not c.borrowed or c.repaid:
+                        continue
+                    needs_refresh = (
+                        c.id in affected_ids
+                        or c.dynamic_synced_block == 0
+                        or (c.next_interest_ts and c.next_interest_ts <= now_ts)
+                    )
+                    if not needs_refresh:
+                        continue
+                    interest_amount, _periods = (
+                        contract.functions.previewInterestToPay(c.id).call()
+                    )
+                    next_dt = contract.functions.getNextInterestPayDate(c.id).call()
+                    unpaid = contract.functions.getUnpaidInterestPeriods(c.id).call()
+                    c.interest_due = interest_amount
+                    c.next_interest_ts = next_dt
+                    c.unpaid_periods = unpaid
+                    c.dynamic_synced_block = current_block
+                    dynamic_refreshed += 1
+
+                if dynamic_refreshed:
+                    print(
+                        f"[lcg cache] dynamic refresh: {dynamic_refreshed} loan(s)"
+                    )
+
+                session.commit()
+
+                snapshot = [
+                    {
+                        "id": c.id,
+                        "borrower": c.borrower,
+                        "borrowed_at": c.borrowed_at,
+                        "duration": c.duration,
+                        "principal_debt": c.principal_debt,
+                        "borrowed": c.borrowed,
+                        "repaid": c.repaid,
+                        "interest_due": c.interest_due,
+                        "next_interest_ts": c.next_interest_ts,
+                        "unpaid_periods": c.unpaid_periods,
+                    }
+                    for c in cached_loans
+                ]
+
+            loans = []
+            for c in snapshot:
+                if not c["borrowed"] or c["repaid"]:
+                    continue
+                loans.append(
+                    {
+                        "id": c["id"],
+                        "borrower": c["borrower"],
+                        "principal_debt": c["principal_debt"],
+                        "interest_due": c["interest_due"],
+                        "next_interest_ts": c["next_interest_ts"],
+                        "maturity_ts": c["borrowed_at"] + c["duration"],
+                        "unpaid_periods": c["unpaid_periods"],
+                    }
+                )
+            return loans
+        except Exception as e:
+            print(f"Error reading LCG loans: {e}")
             return None
 
     def get_total_staked(self, contract_address=config.eth_lcg_staking):

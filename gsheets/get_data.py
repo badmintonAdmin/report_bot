@@ -44,25 +44,6 @@ def get_pools():
     return gen_content
 
 
-def get_loans():
-    df = gsheet.get_data(int(config.LOANS))
-    if df.empty:
-        return [m.hbold("The file with loans data is empty")]
-    filtered_df = filtered(df, 5)
-    if filtered_df.empty:
-        text = [m.hbold("No loan payments due"), "=" * 32]
-        return text
-    gen_content = [m.hbold("==LANDX CREDIT GATEWAY==")]
-    now = pd.Timestamp.now().normalize()
-    for i, row in filtered_df.iterrows():
-        gen_content.append(
-            f"{row['NO']}:{row['name']} | Total due: {row['total']} | DAYS: {(row['date'] - now).days}"
-        )
-        gen_content.append("=" * 32)
-
-    return gen_content
-
-
 # def get_epoch():
 #     df = gsheet.get_data(int(config.EPOCH))
 #     if df.empty:
