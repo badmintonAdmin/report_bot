@@ -12,6 +12,8 @@ from local_db.models.sync_state import SyncStateModel
 LCG_BORROWER_LAST_BLOCK_KEY = "lcg_borrower_last_block"
 LCG_EVENT_NAMES = ("Opened", "Borrowed", "InterestPaid", "Repaid")
 GETLOGS_CHUNK = 9000
+EPOCH_CACHE_TTL_SECONDS = 30 * 60
+EPOCH_CACHE_KEY_PREFIX = "epoch_cache_"
 
 
 class ContractData:
@@ -88,13 +90,49 @@ class ContractData:
         if not contract:
             return None
 
+        cache_key = f"{EPOCH_CACHE_KEY_PREFIX}{chain}"
+        now_ts = int(time.time())
+
+        with sync_session() as session:
+            cached = session.get(SyncStateModel, cache_key)
+            if cached:
+                try:
+                    payload = json.loads(cached.value)
+                    epoch = tuple(payload["epoch"])
+                    next_epoch = tuple(payload["next_epoch"])
+                    cached_at = int(payload.get("cached_at", 0))
+                    fresh = (
+                        now_ts - cached_at < EPOCH_CACHE_TTL_SECONDS
+                        and now_ts < epoch[2]
+                    )
+                    if fresh:
+                        return {"epoch": epoch, "next_epoch": next_epoch}
+                except (ValueError, KeyError, TypeError) as e:
+                    print(f"[epoch cache] invalid cached value for {chain}: {e}")
+
         try:
             epoch = contract.functions.getCurrentEpoch().call()
             next_epoch = contract.functions.epoch(epoch[0] + 1).call()
-            return {"epoch": epoch, "next_epoch": next_epoch}
         except Exception as e:
             print(f"Error interacting with epoch contract: {e}")
             return None
+
+        with sync_session() as session:
+            payload = json.dumps(
+                {
+                    "epoch": list(epoch),
+                    "next_epoch": list(next_epoch),
+                    "cached_at": now_ts,
+                }
+            )
+            cached = session.get(SyncStateModel, cache_key)
+            if cached is None:
+                session.add(SyncStateModel(id=cache_key, value=payload))
+            else:
+                cached.value = payload
+            session.commit()
+
+        return {"epoch": epoch, "next_epoch": next_epoch}
 
     def get_total_borrowed(self, contract_address=config.eth_lcg_borrower):
         contract = self.contract_factory(
